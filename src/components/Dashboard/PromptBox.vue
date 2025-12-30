@@ -1,8 +1,8 @@
 <template>
-   <div class="block md:hidden">
-    <p class="label_1_semibold">Set Up Your Brand</p>
-    <p class="label_1_semibold">Plan Weekly Posts</p>
-    <p class="label_1_semibold">Create Social Posts</p>
+   <div class="block md:hidden flex text-center justify-center gap-2 py-4 px-6 mb-[-2.5em]">
+    <p class="caption_2_semibold primary_text_color cursor-pointer">Set Up Your Brand</p>
+    <p class="caption_2_semibold primary_text_color cursor-pointer">Plan Weekly Posts</p>
+    <p class="caption_2_semibold primary_text_color cursor-pointer">Create Social Posts</p>
    </div>
 
   <div

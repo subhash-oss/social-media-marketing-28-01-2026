@@ -96,7 +96,9 @@
   .card {
   @apply rounded-xl border border-[#F1F2F4] p-6 shadow-sm transition cursor-pointer;
 }
-
+.caption_2_semibold{
+  @apply text-[0.5625em] font-semibold 
+}
 
 .icon {
   @apply h-9 w-9;
