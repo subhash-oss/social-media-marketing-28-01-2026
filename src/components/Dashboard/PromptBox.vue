@@ -1,7 +1,16 @@
 <template>
+   <div class="block md:hidden">
+    <p class="label_1_semibold">Set Up Your Brand</p>
+    <p class="label_1_semibold">Plan Weekly Posts</p>
+    <p class="label_1_semibold">Create Social Posts</p>
+   </div>
+
   <div
     class="mx-auto mt-10 max-w-3xl rounded-xl bg-gradient-to-r from-[#CD519D] to-[#7950F2] p-[1px] shadow-lg"
   >
+
+   
+
     <div class="rounded-xl bg-white p-4">
       <!-- Prompt Input -->
       <input
@@ -20,20 +29,26 @@
               @click="toggleProducts"
               class="flex items-center gap-2 rounded-md border border-[#DCDFE4] px-3 py-1 label_2_medium text-[#596773]"
             >
-            <img :src="ProductIcon" alt="">
-              {{ selectedProduct }}
-              <span><img :src="DownArrow" alt=""></span>
+              <img :src="ProductIcon" alt="" />
+
+              <!-- Desktop text -->
+              <span class="hidden md:inline">
+                {{ selectedProduct }}
+              </span>
+
+              <img :src="DownArrow" alt="" />
             </button>
 
+            <!-- Dropdown -->
             <div
               v-if="showProducts"
-              class="absolute left-0 top-8 z-10 w-40 rounded-md border border-[#DCDFE4] bg-white shadow"
+              class="absolute left-0 top-9 z-10 w-40 rounded-md border border-[#DCDFE4] bg-white shadow"
             >
               <div
                 v-for="item in products"
                 :key="item"
                 @click="selectProduct(item)"
-                class="cursor-pointer px-3 py-2 label_2_medium text-[#596773] hover:bg-purple-50"
+                class="cursor-pointer px-3 py-2 label_2_medium text-[#596773] "
               >
                 {{ item }}
               </div>
@@ -44,8 +59,13 @@
           <label
             class="flex cursor-pointer items-center gap-2 rounded-md border border-[#DCDFE4] px-3 py-1 label_2_medium text-[#596773]"
           >
-          <img :src="AttachmentIcon" alt="">
-            Add files
+            <img :src="AttachmentIcon" alt="" />
+
+            <!-- Desktop text -->
+            <span class="hidden md:inline">
+              Add files
+            </span>
+
             <input
               type="file"
               class="hidden"
@@ -60,20 +80,26 @@
               @click="toggleModels"
               class="flex items-center gap-2 rounded-md border border-[#DCDFE4] px-3 py-1 label_2_medium text-[#596773]"
             >
-            <img :src="GeminiIcon" alt="">
-              {{ selectedModel }}
-              <span><img :src="DownArrow" alt=""></span>
+              <img :src="GeminiIcon" alt="" />
+
+              <!-- Desktop text -->
+              <span class="hidden md:inline">
+                {{ selectedModel }}
+              </span>
+
+              <img :src="DownArrow" alt="" />
             </button>
 
+            <!-- Dropdown -->
             <div
               v-if="showModels"
-              class="absolute left-0 top-8 z-10 w-40 rounded-md border bg-white shadow"
+              class="absolute left-0 top-9 z-10 w-40 rounded-md border border-[#DCDFE4] bg-white shadow"
             >
               <div
                 v-for="model in models"
                 :key="model"
                 @click="selectModel(model)"
-                class="cursor-pointer px-3 py-2 label_2_medium text-[#596773] hover:bg-purple-50"
+                class="cursor-pointer px-3 py-2 label_2_medium text-[#596773] "
               >
                 {{ model }}
               </div>
@@ -82,10 +108,12 @@
         </div>
 
         <!-- Mic -->
-        <img :src="MikeIcon" alt="">
+        <button class="rounded-full">
+          <img :src="MikeIcon" alt="" />
+        </button>
       </div>
 
-      <!-- Selected Files Preview (Optional UI) -->
+      <!-- Selected Files Preview -->
       <div v-if="files.length" class="mt-3 flex flex-wrap gap-2">
         <span
           v-for="file in files"
@@ -96,17 +124,17 @@
         </span>
       </div>
     </div>
-    
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+
 import ProductIcon from "../../assets/images/ProductIcon.svg";
-import AttachmentIcon from "../../assets/images/AttachmentIcon.svg"
-import GeminiIcon from "../../assets/images/GeminiIcon.svg"
-import DownArrow from "../../assets/images/DownArrow.svg"
-import MikeIcon from "../../assets/images/MikeIcon.svg"
+import AttachmentIcon from "../../assets/images/AttachmentIcon.svg";
+import GeminiIcon from "../../assets/images/GeminiIcon.svg";
+import DownArrow from "../../assets/images/DownArrow.svg";
+import MikeIcon from "../../assets/images/MikeIcon.svg";
 
 /* Prompt */
 const prompt = ref("");
@@ -147,6 +175,5 @@ const selectModel = (model) => {
 
 const handleFiles = (e) => {
   files.value = Array.from(e.target.files);
-  console.log("Uploaded files:", files.value);
 };
 </script>

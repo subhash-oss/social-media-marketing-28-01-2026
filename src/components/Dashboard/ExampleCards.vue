@@ -1,10 +1,10 @@
 <template>
-  <div class="mx-auto mt-10 max-w-3xl">
-    <p class="mb-4 text-left text-sm text-gray-500">
+  <div class="mx-auto mt-10 max-w-3xl hidden md:inline">
+    <p class="mb-4  mt-10 text-left text-sm text-gray-500">
       Start with the example below
     </p>
 
-      <section class="mt-10">
+      <section class="mt-1">
     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
       <!-- Card 1 -->
       <div class="card">
