@@ -10,8 +10,8 @@
   <!-- Popup -->
   <div
     v-if="open"
-    class="fixed top-2 z-50 w-[40%] rounded-xl bg-white shadow-2xl"
-    :class="isCollapsed ? 'left-20' : 'left-[16.5em]'"
+    class="fixed inset-0 z-50 bg-white shadow-2xl lg:inset-auto lg:top-2 lg:rounded-xl lg:w-[40%]"
+    :class="isCollapsed ? 'lg:left-20' : 'lg:left-[16.5em]'"
   >
     <!-- Header -->
     <div class="flex items-start justify-between border-b p-4">

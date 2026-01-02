@@ -34,7 +34,7 @@
         <AnalyticsView v-else-if="activeTab === 'analytics'" />
         <ProductsView v-else-if="activeTab === 'products'" />
         <SettingsView v-else-if="activeTab === 'settings'" />
-        <NotificationsView v-else-if="activeTab === 'notifications'" />
+        <NotificationsView v-if="activeTab === 'notifications'" :open="true" :isCollapsed="false" @close="activeTab = 'chat'" class="lg:hidden" />
       </main>
     </div>
   </div>
