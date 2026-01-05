@@ -67,8 +67,11 @@
   .body_3_regular{
     @apply font-normal text-[0.875em] text-[#1F2937]
   }
+  .body_3_medium {
+    @apply font-medium text-[0.85em]
+  }
   .body_4_regular{
- @apply text-[#596773] font-normal text-[0.75em]
+ @apply text-[#596773] font-normal text-[0.75em] text-[#15172E]
   }
   /* button styles */
   .secondary_google_button {
@@ -87,6 +90,9 @@
   .secondary_bg_color{
     @apply bg-[#F3F0FF]
   }
+  .primary_add_button {
+  @apply bg-[#7950F2] text-[#ffffff] font-bold cursor-pointer text-[0.85em]  rounded-[8px] ;
+ }
   .text_color{
     @apply text-[#38414A];
   }

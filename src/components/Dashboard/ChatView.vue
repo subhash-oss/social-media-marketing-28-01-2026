@@ -10,12 +10,12 @@
     </h2>
 
     <PromptBox />
-    <ExampleCards />
+    <Cards />
   </div>
   </main>
 </template>
 
 <script setup>
 import PromptBox from "../../components/Dashboard/PromptBox.vue";
-import ExampleCards from "../../components/Dashboard/ExampleCards.vue";
+import Cards from "../../components/Dashboard/Cards.vue";
 </script>
