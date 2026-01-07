@@ -1,7 +1,7 @@
 <template>
-  <section class="p-2">
+  <section class="pt-2">
     <!-- Header -->
-    <div class="mb-6 bg_white py-4 px-4 rounded-2xl primary_border_color">
+    <div class="bg_white py-4 px-4 rounded-2xl primary_border_color">
       <h2 class="heading_h6_bold">Analytics</h2>
       <p class="label_1_regular">
         Track engagement, reach, and performance across all your connected platforms.
@@ -9,7 +9,7 @@
     </div>
 
     <!-- Tabs and Dropdowns -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg_white py-4 px-4 rounded-2xl primary_border_color">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg_white py-4 px-4 rounded-2xl primary_border_color common_gap">
       
       <!-- Tabs -->
       <div class="flex gap-2 ">

@@ -39,6 +39,9 @@
   .label_1_medium{
  @apply font-medium text-[1em] tracking-[0.18px] text-[#454F59]
   }
+   .label_1_regular_withount_color{
+    @apply font-normal text-[1em] tracking-[0.15px];
+  }
   .label_1_regular{
     @apply font-normal text-[1em] tracking-[0.15px] text-[#38414A];
   }
@@ -63,6 +66,9 @@
 
   .secondary_label_medium{
     @apply text-[1em] font-bold 
+  }
+  .body_1_regular{
+    @apply font-normal text-[1.125em]
   }
   .Body_2_Medium {
     @apply font-medium text-[1em] text-[#8590A2]
@@ -115,6 +121,9 @@
   .primary_border_color{
     @apply border border-[#F1F2F4]
   }
+  .secondary_border_color{
+   @apply border border-[#DFD8FD]
+  }
   .or_text{
     @apply text-[#6B7280] text-[14px] font-medium
   }
@@ -133,9 +142,22 @@
   .paragraph_p5_medium{
   @apply text-[0.875em] text-[#22272B] font-medium
   }
-
+  .paragraph_p5_regular{
+    @apply font-normal text-[0.875em] text-[#555963]
+  }
   /* --------------------------------------------------------------------------------------- */
-
+  .publish_text_style{
+    @apply text-[#1D7AFC] bg-[#E9F2FF]
+  }
+  .pending_text_style{
+    @apply text-[#E56910] bg-[#FFF3EB]
+  }
+  .approve_text_style{
+    @apply text-[#22A06B] bg-[#DCFFF1]
+  }
+  .common_gap{
+    @apply mt-5
+  }
   .card {
   @apply rounded-xl border border-[#F1F2F4] p-6 shadow-sm transition cursor-pointer;
 }
