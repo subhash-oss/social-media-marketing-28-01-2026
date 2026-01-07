@@ -11,7 +11,18 @@
 }
 
 @layer components {
- 
+  /* button styles */
+  .secondary_google_button {
+    @apply rounded-[8px] border border-[#E9EAEC] w-full flex items-center justify-center gap-2 bg-[#F9FAFB] p-2 mt-7 font-semibold text-[1em] text-[#38414A];
+  }
+
+ .primary_button {
+  @apply bg-[#7950F2] text-[#ffffff] font-bold cursor-pointer text-[1em] h-[3em] rounded-[8px] ;
+ }
+  .disabled_primary_button {
+    @apply bg-[#7950F2] text-[#ffffff] font-bold cursor-pointer text-[1em] h-[3em] rounded-[8px] opacity-50;
+  }
+  
   .gradient_text_color{
     @apply bg-gradient-to-r from-[#CD519D] to-[#7950F2] bg-clip-text text-transparent ;
   }
@@ -82,17 +93,7 @@
   .body_4_regular{
  @apply text-[#596773] font-normal text-[0.75em] text-[#15172E]
   }
-  /* button styles */
-  .secondary_google_button {
-    @apply rounded-[8px] border border-[#E9EAEC] w-full flex items-center justify-center gap-2 bg-[#F9FAFB] p-2 mt-7 font-semibold text-[1em] text-[#38414A];
-  }
 
- .primary_button {
-  @apply bg-[#7950F2] text-[#ffffff] font-bold cursor-pointer text-[1em] h-[3em] rounded-[8px] ;
- }
-  .disabled_primary_button {
-    @apply bg-[#7950F2] text-[#ffffff] font-bold cursor-pointer text-[1em] h-[3em] rounded-[8px] opacity-50;
-  }
   .secondary_text_color{
     @apply text-[#7950F2]
   }
@@ -123,6 +124,9 @@
   }
   .secondary_border_color{
    @apply border border-[#DFD8FD]
+  }
+  .sub_border_color{
+   @apply border border-[#E5DBFF]
   }
   .or_text{
     @apply text-[#6B7280] text-[14px] font-medium
