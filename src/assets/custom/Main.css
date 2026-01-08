@@ -118,6 +118,9 @@
   .bg_white{
    @apply bg-[#FFFFFF]
   }
+  .bg_brand_color{
+    @apply bg-[#7950F2]
+  }
 
   .primary_border_color{
     @apply border border-[#F1F2F4]
@@ -127,6 +130,12 @@
   }
   .sub_border_color{
    @apply border border-[#E5DBFF]
+  }
+  .inputbox_border_color{
+   @apply border border-[#B3B9C4]
+  }
+  .brand_border_color{
+  @apply border border-[#6E5DC6]
   }
   .or_text{
     @apply text-[#6B7280] text-[14px] font-medium
@@ -150,6 +159,9 @@
     @apply font-normal text-[0.875em] text-[#555963]
   }
   /* --------------------------------------------------------------------------------------- */
+  .brand_section_height{
+    height: 46vh;
+  }
   .publish_text_style{
     @apply text-[#1D7AFC] bg-[#E9F2FF]
   }

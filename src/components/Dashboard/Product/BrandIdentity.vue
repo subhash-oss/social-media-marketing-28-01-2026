@@ -64,11 +64,19 @@
     </div>
 
     <!-- Placeholder for other tabs -->
-     <div v-else-if="activeTab === 'brand-colors'" class="text-center py-12">
+     <div v-else-if="activeTab === 'brand-colors'" >
       <BrandColor/>
     </div>
+   <!-- tab for typography -->
+    <div v-else-if="activeTab === 'typography'">
+      <BrandTypography/>
+    </div>
+    <!-- tab for typography -->
+    <div v-else-if="activeTab === 'tone-style'">
+      <BrandStyle/>
+    </div>
 
-    <div v-else class="text-center py-12">
+    <div v-else>
       <p class="label_1_regular text-[#8590A2]">{{ activeTab }} content coming soon...</p>
     </div>
 
@@ -78,6 +86,8 @@
 <script setup>
 import BrandInfoFields from "../product/BrandInfo/BrandInfoFields.vue";
 import BrandColor from "../product/BrandInfo/BrandColor.vue";
+import BrandTypography from "../product/BrandInfo/BrandTypography.vue"
+import BrandStyle from "../product/BrandInfo/BrandStyle.vue"
 import ProductInfoIcon from "../../../assets/images/ProductInfoIcon.svg" 
 import BrandColorIcon from "../../../assets/images/BrandColorIcon.svg" 
 import TypographyIcon from "../../../assets/images/TypographyIcon.svg" 

@@ -1,11 +1,11 @@
 <template>
-  <div class="space-y-6 bg_white rounded-2xl py-7 px-4">
+  <div class="space-y-6 bg_white rounded-2xl py-7 px-4 brand_section_height">
     <!-- Product name field -->
-    <div class="flex gap-5 flex-col lg:gap-48 lg:flex-row">
+    <div class="flex gap-3 flex-col justify-between lg:flex-row">
       <label class="label_2_medium primary_text_color w-32 flex-shrink-0 ">
         Product name
       </label>
-      <div class="flex-1 ">
+      <div class="w-[100%] lg:w-[70%]">
         <input
           :model-value="productName"
           @input="$emit('update:productName', $event.target.value)"
@@ -17,11 +17,11 @@
     </div>
 
     <!-- Description field -->
-    <div class="flex gap-5 flex-col lg:gap-48 lg:flex-row">
+    <div class="flex gap-3 flex-col justify-between lg:flex-row">
       <label class="label_2_medium primary_text_color w-32 flex-shrink-0">
         Description
       </label>
-      <div class="flex-1">
+      <div class="w-[100%] lg:w-[70%]">
         <textarea
           :model-value="description"
           @input="$emit('update:description', $event.target.value)"
