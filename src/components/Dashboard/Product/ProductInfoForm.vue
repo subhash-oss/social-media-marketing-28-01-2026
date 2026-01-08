@@ -47,7 +47,7 @@
         </div>
       </div>
       </div>
-    <div class="bg_white rounded-2xl p-6">
+    <div>
       <!-- Step 1: Brand Info -->
       <BrandInfo
         v-if="currentStep === 1"

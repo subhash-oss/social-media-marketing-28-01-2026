@@ -1,5 +1,6 @@
 <template>
-  <div class="mb-4">
+  <div class="bg_white rounded-2xl p-6">
+  <div class="mb-4 ">
     <div class="mb-4 gap-8 lg:w-1/2">
       <!-- Left Side: Illustration -->
       <div class=" flex-shrink-0">
@@ -249,6 +250,7 @@
       </div>
     </div>
   </div>
+ </div> 
 </template>
 
 <script setup>
