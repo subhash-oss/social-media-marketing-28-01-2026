@@ -97,6 +97,9 @@
   .secondary_text_color{
     @apply text-[#7950F2]
   }
+  .sub_text_color{
+    @apply text-[#596773]
+  }
   .secondary_bg_color{
     @apply bg-[#F3F0FF]
   }
