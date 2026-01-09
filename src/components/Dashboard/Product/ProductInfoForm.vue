@@ -47,7 +47,7 @@
         </div>
       </div>
       </div>
-    <div>
+    <div class="h-[100%]">
       <!-- Step 1: Brand Info -->
       <BrandInfo
         v-if="currentStep === 1"
@@ -71,6 +71,13 @@
       />
     </div>
       <!-- Bottom Navigation -->
+      <!-- Success Modal -->
+      <BrandCreatedSuccessModal
+        :open="showSuccessModal"
+        @close="showSuccessModal = false"
+        @view-product="handleViewProduct"
+        @go-to-chat="handleGoToChat"
+      />
       <div class="flex items-center justify-between bg_white common_gap p-3 primary_border_color rounded-2xl">
         <button
           @click="handleBack"
@@ -98,10 +105,13 @@
 
 <script setup>
 import { ref, watch, nextTick } from "vue";
+import { useRouter } from "vue-router";
 import BrandInfo from "./BrandInfo.vue";
 import BrandIdentity from "./BrandIdentity.vue";
 import SocialConnections from "./SocialConnections.vue";
+import BrandCreatedSuccessModal from "./BrandCreatedSuccessModal.vue";
 import DoneArrowRight from "../../../assets/images/DoneArrowRight.svg"
+
 
 const props = defineProps({
   currentStep: {
@@ -112,11 +122,14 @@ const props = defineProps({
 
 const emit = defineEmits(["back", "continue", "close"]);
 
+const router = useRouter();
+
 const activeTab = ref("product-info");
 const websiteUrl = ref("");
 const productName = ref("Lumo Vibe");
 const description = ref("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.");
 const isStep1Valid = ref(false);
+const showSuccessModal = ref(false);
 
 // Refs for step navigation scrolling
 const scrollContainer = ref(null);
@@ -168,6 +181,12 @@ const handleBack = () => {
 };
 
 const handleContinue = () => {
+  // If on step 3, show success modal instead of moving to next step
+  if (props.currentStep === 3) {
+    showSuccessModal.value = true;
+    return;
+  }
+  
   // Always move to next step when Continue is clicked
   emit("continue", {
     websiteUrl: websiteUrl.value,
@@ -191,6 +210,18 @@ const handleValidationChange = (validation) => {
 const handleConnectSocial = (platform) => {
   // Handle social media connection logic here
   console.log("Connect to:", platform);
+};
+
+const handleViewProduct = () => {
+  // Handle view product logic here
+  console.log("View Product clicked");
+  emit("close");
+};
+
+const handleGoToChat = () => {
+  // Navigate to dashboard with chat tab active
+  router.push({ path: '/dashboard', query: { tab: 'chat' } });
+  emit("close");
 };
 </script>
 

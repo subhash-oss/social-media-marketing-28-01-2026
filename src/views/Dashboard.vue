@@ -40,7 +40,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 import Sidebar from "../components/Dashboard/Sidebar.vue";
 import SidebarMobile from "../components/Dashboard/SidebarMobile.vue";
@@ -53,8 +54,30 @@ import SettingsView from "../components/Dashboard/SettingsView.vue";
 import NotificationsView from "../components/Dashboard/NotificationsView.vue";
 import SidebarIcon from "../assets/images/SidebarIcon.svg"
 
+const route = useRoute();
+const router = useRouter();
 const activeTab = ref("chat");
 const showMobileSidebar = ref(false);
+
+// Check query parameter on mount and route changes
+const checkTabQuery = () => {
+  if (route.query.tab && typeof route.query.tab === 'string') {
+    const validTabs = ['chat', 'calendar', 'analytics', 'products', 'settings'];
+    if (validTabs.includes(route.query.tab)) {
+      activeTab.value = route.query.tab;
+    }
+    // Remove query parameter after using it to clean up the URL
+    router.replace({ query: {} });
+  }
+};
+
+onMounted(() => {
+  checkTabQuery();
+});
+
+watch(() => route.query, () => {
+  checkTabQuery();
+}, { deep: true });
 
 const handleTabChange = (tab) => {
   activeTab.value = tab;
