@@ -70,22 +70,12 @@
 
         <!-- Localization Tab Content -->
         <div v-else-if="activeTab === 'localization'">
-          <div class="bg_white rounded-2xl py-7 px-4 border border-[#F1F2F4]">
-            <h2 class="heading_h5_bold mb-2">Localization</h2>
-            <p class="label_1_regular">
-              Configure your language and regional settings.
-            </p>
-          </div>
+          <Localization />
         </div>
 
         <!-- Security Tab Content -->
         <div v-else-if="activeTab === 'security'">
-          <div class="bg_white rounded-2xl py-7 px-4 border border-[#F1F2F4]">
-            <h2 class="heading_h5_bold mb-2">Security</h2>
-            <p class="label_1_regular">
-              Manage your security settings and two-factor authentication.
-            </p>
-          </div>
+          <Security />
         </div>
 
         <!-- Data & Privacy Settings Tab Content -->
@@ -106,6 +96,8 @@
 import { ref, reactive, h, onMounted, nextTick } from "vue";
 import UserProfile from "../../components/Dashboard/Settings/UserProfile.vue"
 import Billing from "../../components/Dashboard/Settings/Billing.vue"
+import Localization from "../../components/Dashboard/Settings/localization.vue"
+import Security from "../../components/Dashboard/Settings/Security.vue"
 
 const PersonIcon = (props) =>
   h("svg", { 

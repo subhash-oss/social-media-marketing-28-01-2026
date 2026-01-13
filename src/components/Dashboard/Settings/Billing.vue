@@ -2,7 +2,7 @@
   <div class="rounded-2xl bg-white common_inner_gap shadow-sm">
     <!-- Header -->
     <h2 class="heading_h6_bold">Billing & Plan</h2>
-    <p class="label_1_regular mt-1 mb-10">
+    <p class="label_1_regular regular_gap medium_mb">
       View your plan, manage payments, and track AI credits.
     </p>
 
@@ -47,11 +47,11 @@
           </div>
         </div>
          <!-- Horizontal line (Mobile only) -->
-        <div class="block lg:hidden h-[2px] w-full bg_primary_color my-4"></div>
+        <div class="block lg:hidden h-[2px] w-full hr_linr_bg my-4"></div>
         <!-- Renew -->
         <div class="flex">
             <!-- Vertical line (Desktop only) -->
-           <div class=" hidden lg:block w-[4px] h-28 bg_primary_color mr-5"></div>
+           <div class=" hidden lg:block w-[4px] h-28 hr_linr_bg mr-5"></div>
 
           <div class="w-[100%]">
           <p class="label_2_medium">Renew at</p>

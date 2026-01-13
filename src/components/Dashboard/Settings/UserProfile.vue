@@ -1,7 +1,7 @@
 <template>
      <div class="bg_white rounded-2xl common_inner_gap primary_border_color mb-6">
             <h2 class="heading_h6_bold">Profile Information</h2>
-            <p class="label_1_regular mt-1 mb-10">
+            <p class="label_1_regular regular_gap medium_mb">
               Update your profile, secure your account, and manage connected apps.
             </p>
 

@@ -4,7 +4,7 @@
       Start with the example below
     </p>
 
-      <section class="mt-1">
+      <section class="regular_gap">
     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
       <!-- Card 1 -->
       <div class="card">

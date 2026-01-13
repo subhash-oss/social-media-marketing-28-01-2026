@@ -69,7 +69,7 @@
         </div>
 
         <!-- Post Image -->
-        <div class="rounded-lg overflow-hidden bg_white flex justify-center mt-1">
+        <div class="rounded-lg overflow-hidden bg_white flex justify-center regular_gap">
           <img
             :src="postData?.image"
             :alt="postData?.title"
@@ -78,7 +78,7 @@
         </div>
 
         <!-- Caption -->
-        <div class="mt-1">
+        <div class="regular_gap">
           <p class="body_1_regular primary_text_color pt-3 border-b pb-3">
             {{ getFullCaption() }}
           </p>

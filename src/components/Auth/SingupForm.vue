@@ -12,7 +12,7 @@
         Create your account
       </h2>
 
-      <p class="label_1_regular mt-1">
+      <p class="label_1_regular regular_gap">
         Start creating AI-powered social posts for your brand.
       </p>
 
@@ -83,7 +83,7 @@
             <input
               type="checkbox"
               v-model="form.terms"
-              class="accent-[#7950F2] mt-1"
+              class="accent-[#7950F2] regular_gap"
             />
             <span>
               I agree to the

@@ -12,7 +12,7 @@
         Sign In
       </h2>
 
-      <p class="label_1_regular mt-1">
+      <p class="label_1_regular regular_gap">
         Manage your posts, analytics, and campaigns with AI.
       </p>
 

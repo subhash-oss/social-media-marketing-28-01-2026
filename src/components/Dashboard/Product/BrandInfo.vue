@@ -121,7 +121,7 @@
                   {{ fileItem.name }}
                 </p>
                 <!-- File Size and Status -->
-                <div class="flex items-center gap-2 mt-1">
+                <div class="flex items-center gap-2 regular_gap">
                   <p v-if="fileItem.status === 'uploading'" class="label_3_regular">
                     {{ formatFileSize(fileItem.uploaded) }} of {{ formatFileSize(fileItem.size) }}
                   </p>

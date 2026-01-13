@@ -16,7 +16,7 @@
         {{ value }}
       </span>
 
-      <span class="mt-1 label_3_regular">
+      <span class="regular_gap label_3_regular">
         {{ description }}
       </span>
     </div>
