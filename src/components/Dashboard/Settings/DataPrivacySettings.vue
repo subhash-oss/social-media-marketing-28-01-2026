@@ -1,5 +1,15 @@
 <template>
   <div class="rounded-2xl bg_white common_inner_gap shadow-sm">
+    <!-- Delete Confirmation Modal -->
+    <ConfirmDataDeletionModal
+      :open="showDeleteModal"
+      title="Confirm Data Deletion"
+      description="To keep your account secure, we've sent a 6-digit verification code to your registered email address. Please enter it below to permanently delete all stored data."
+      @close="showDeleteModal = false"
+      @delete="handleDeleteData"
+      @resend="handleResendCode"
+    />
+
     <!-- Header -->
     <h2 class="heading_h6_bold">Data & Privacy Settings</h2>
     <p class="label_1_regular regular_gap medium_mb">
@@ -15,6 +25,7 @@
         </p>
       </div>
       <button
+        @click="showDeleteModal = true"
         class="button_thin px-6 rounded-lg inputbox_border_color bg_white sub_button_semibold"
       >
         Delete My Data
@@ -67,8 +78,23 @@
 
 <script setup>
 import { ref } from "vue";
+import ConfirmDataDeletionModal from "./ConfirmDataDeletionModal.vue";
 
 const aiContentLearning = ref(true);
 const analyticsSharing = ref(false);
+const showDeleteModal = ref(false);
+
+const handleDeleteData = (code) => {
+  // Handle data deletion logic here
+  console.log("Deleting data with code:", code);
+  // You can add API call here
+  // Note: Don't close the modal here - the modal will close itself after showing "Deleting..." for 2 seconds
+};
+
+const handleResendCode = () => {
+  // Handle resend code logic here
+  console.log("Resending verification code");
+  // You can add API call here
+};
 </script>
 

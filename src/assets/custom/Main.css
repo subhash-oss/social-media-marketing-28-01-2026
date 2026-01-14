@@ -62,6 +62,9 @@
   .label_1_regular{
     @apply font-normal text-[1em] tracking-[0.15px] text-[#38414A];
   }
+  .label_1_bold{
+    @apply font-bold text-[1em] tracking-[0.15px] text-[#38414A];
+  }
   .label_1_semibold{
   @apply font-semibold text-[1em] tracking-[-0.18px] text-[#1D2125]
   }
@@ -140,6 +143,12 @@
   }
   .bg_toggle_button{
     @apply bg-[#DCDFE4]
+  }
+  .bg_button_secondary{
+    @apply bg-[#F1F2F9]
+  }
+  .bg_delete_button{
+  @apply bg-[#C9372C]
   }
   .primary_border_color{
     @apply border border-[#F1F2F4]
