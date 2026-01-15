@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl bg-white common_inner_gap shadow-sm">
+  <div class="rounded-2xl bg_white common_inner_gap shadow-sm">
     <!-- Header -->
     <h2 class="heading_h6_bold">Billing & Plan</h2>
     <p class="label_1_regular regular_gap medium_mb">
@@ -18,7 +18,7 @@
 
           <div class="medium_gap flex items-center gap-3">
             <button
-              class="primary_add_button button_thin w-4/5 lg:button_width"
+              class="primary_add_button secondary_button_thin w-4/5 lg:button_width"
             >
               Upgrade Plan
             </button>
@@ -58,7 +58,7 @@
           <p class="heading_h6_semibold medium_gap seconary_title_text_color">Oct 26, 2025</p>
 
           <button
-            class="medium_gap rounded-lg button_thin secondary_bg_color w-4/5 lg:button_width"
+            class="medium_gap rounded-lg secondary_button_thin secondary_bg_color w-4/5 lg:button_width"
           >
             Refill Credits
           </button>

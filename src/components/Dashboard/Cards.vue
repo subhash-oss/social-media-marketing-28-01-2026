@@ -4,10 +4,10 @@
       Start with the example below
     </p>
 
-      <section class="regular_gap">
+      <section class="regular_gap max-w-3xl">
     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
       <!-- Card 1 -->
-      <div class="card">
+      <div class="card bg_white">
         <div>
           <img :src="TickIcon" class="icon mb-2" />
         </div>
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Card 2 -->
-      <div class="card">
+      <div class="card bg_white">
         <div>
           <img :src="TickIcon" class="icon mb-2" />
         </div>
@@ -33,7 +33,7 @@
       </div>
 
       <!-- Card 3 -->
-      <div class="card">
+      <div class="card bg_white">
         <div>
           <img :src="TickIcon" class="icon mb-2" />
         </div>

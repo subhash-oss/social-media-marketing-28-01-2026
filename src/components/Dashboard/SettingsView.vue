@@ -1,5 +1,5 @@
 <template>
-  <main class="flex-1 bg_primary_color px-2 py-2 md:px-6 md:py-6">
+  <main class="flex-1 bg_primary_color px-4 py-10 md:px-10">
     <div class="max-w-full md:max-w-none">
       <!-- Navigation Tabs -->
       <div class="relative mb-8 border-b primary_border_color bg_white rounded-2xl p-3 md:p-3">

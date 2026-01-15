@@ -1,5 +1,5 @@
 <template>
-    <main class="flex-1 bg_primary_color  px-2 py-2 md:px-6">
+    <main class="flex-1 bg_primary_color  px-4 py-10 md:px-10">
     <Filter v-model:activeTab="activeTab"/>
     <section class="flex gap-4 overflow-x-auto hide-scrollbar sm:grid sm:grid-cols-1 lg:grid lg:grid-cols-4 common_gap">
      <AnalyticsStatCard

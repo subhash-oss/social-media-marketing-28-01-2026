@@ -19,12 +19,11 @@
     <div class="flex flex-1 flex-col overflow-y-auto">
       <!-- Mobile Header -->
       <header
-        class="flex items-center gap-3 border-b bg_white px-4 py-3 lg:hidden"
+        class="flex items-center gap-3 bg_primary_color px-4 py-3 lg:hidden"
       >
         <button @click="showMobileSidebar = true" class="text-xl">
-          <img :src="SidebarIcon" alt="">
+          <img :src="MobileMenuIcon" alt="">
         </button>
-        <span class="font-semibold">Genius AI</span>
       </header>
 
       <!-- Content -->
@@ -53,6 +52,7 @@ import ProductsView from "../components/Dashboard/ProductsView.vue";
 import SettingsView from "../components/Dashboard/SettingsView.vue";
 import NotificationsView from "../components/Dashboard/NotificationsView.vue";
 import SidebarIcon from "../assets/images/SidebarIcon.svg"
+import MobileMenuIcon from "../assets/images/MobileMenuIcon.svg"
 
 const route = useRoute();
 const router = useRouter();

@@ -1,23 +1,23 @@
 <template>
-  <main class="flex-1 bg_primary_color  px-4 py-10 md:px-6">
+  <main class="flex-1 bg_primary_color  px-4 py-5 md:py-10 md:px-10">
   <div class="space-y-6">
     <!-- Header -->
-    <div class="rounded-xl bg_primary_color p-6 shadow primary_border_color">
+    <div class="rounded-xl bg_white common_inner_gap shadow primary_border_color">
       <h2 class="primary_text_color heading_h6_bold">Calendar</h2>
-      <p class="label_1_regular">
+      <p class="label_1_regular regular_gap">
         Manage your brands, connect their channels, and keep assets in one place.
       </p>
     </div>
 
     <!-- Controls -->
-    <div class="flex items-center justify-between rounded-xl bg_white p-4 shadow flex-col-reverse gap-4 md:gap-0 md:flex-row">
+    <div class="flex items-center justify-between rounded-xl bg_white p-3 shadow flex-col-reverse gap-4 md:gap-0 md:flex-row">
       <!-- View Switch -->
       <div class="flex rounded-full bg_secondary_color primary_border_color p-1">
         <button
           v-for="view in views"
           :key="view"
           @click="activeView = view"
-          class="rounded-full primary_border_color px-4 py-1 label_2_semibold"
+          class="rounded-full primary_border_color px-4 py-1 label_2_semibold primary_text_color"
           :class="
             activeView === view
               ? 'bg_white shadow'
@@ -30,10 +30,10 @@
 
       <!-- Right Actions -->
       <div class="flex items-center gap-3">
-        <img :src="ProductIcon" alt="" class="mr-[-36px] z-10">
+        <img :src="ProductIcon" alt="" class="mr-[-40px] md:mr-[-44px] z-10">
         <select
           v-model="selectedProduct"
-          class="flex items-center gap-2 rounded-md primary_border_color pl-6 pr-2 py-2 label_2_medium bg_white"
+          class="flex items-center gap-2 rounded-md primary_border_color pl-8 pr-3 md:pl-10 md:pr-5 py-2 label_2_medium bg_white"
         >
           <option value="single">Single</option>
           <option value="multi">Multi</option>
@@ -49,13 +49,13 @@
     <!-- MONTH VIEW -->
     <div
       v-if="activeView === 'Month'"
-      class="rounded-xl bg_white shadow primary_border_color"
+      class="rounded-xl bg_white primary_border_color "
     >
       <!-- Month Header -->
       <div class="flex items-center justify-between border-b p-4">
-        <button @click="prevMonth">‹</button>
+        <button @click="prevMonth"><img :src="CircleLeftArrow" alt=""></button>
         <p class="heading_h6_semibold primary_text_color">{{ monthYear }}</p>
-        <button @click="nextMonth">›</button>
+        <button @click="nextMonth"><img :src="CircleRightArrow" alt=""></button>
       </div>
 
       <!-- Week Days -->
@@ -70,13 +70,15 @@
         <div
           v-for="date in calendarDays"
           :key="date.key"
-          class="h-20 border p-2 "
+          class="h-14 md:h-20 secondary_button_border p-2 "
           :class="[
             date.isToday ? 'secondary_bg_color border-[#7048E8]' : '',
             !date.isCurrentMonth ? 'bg_white' : ''
           ]"
         >
-          <p class="text-right paragraph_p5_medium">
+          <p class="text-right paragraph_p5_medium"
+           :class="date.isCurrentMonth ? 'primary_text_color' : 'disable_text_color'"
+          >
             {{ date.day }}
           </p>
 
@@ -90,9 +92,9 @@
       class="rounded-xl bg_white  shadow"
     >
       <div class="flex items-center justify-between border-b p-4">
-  <button @click="prevWeek">‹</button>
+  <button @click="prevWeek"><img :src="CircleLeftArrow" alt=""></button>
   <p class="heading_h6_semibold primary_text_color">{{ monthYear }}</p>
-  <button @click="nextWeek">›</button>
+  <button @click="nextWeek"> <img :src="CircleRightArrow" alt=""></button>
 </div>
 
 
@@ -101,7 +103,7 @@
   <div
     v-for="day in weekDaysOnly"
     :key="day.day"
-    class="py-3 text-center "
+    class="p-3 md:common_inner_gap text-center "
     :class="day.isToday ? 'bg-blue-100' : ''"
   >
     <p
@@ -118,11 +120,11 @@
 </div>
 
 
-      <div class="space-y-2">
+      <div class="space-y-2 overflow-auto md:h-[47vh]">
         <div
           v-for="hour in 24"
           :key="hour"
-          class="flex h-12 items-center border-b label_2_regular ml-1"
+          class="flex h-24 items-center border-b label_2_regular ml-1"
         >
           {{ formatHour(hour) }}
         </div>
@@ -148,7 +150,7 @@
 
 
   
-  <div class="mb-6 flex flex-col items-start justify-center border-b pb-2 pt-2 bg_primary_color">
+  <div class="mb-6 flex flex-col items-start justify-center border-b px-2 py-5 bg_primary_color">
     <p class="heading_h5_semibold ml-1">
       {{ dayNumber }}
     </p>
@@ -162,7 +164,7 @@
     <div
       v-for="hour in 24"
       :key="hour"
-      class="flex h-12 items-center  border-b label_2_regular ml-1"
+      class="flex h-20 items-center  border-b label_2_regular ml-1"
     >
       {{ formatHour(hour) }}
     </div>
@@ -261,6 +263,8 @@
 import { ref, computed } from "vue";
 import ProductIcon from "../../assets/images/ProductIcon.svg"
 import WhitePlusIcon from "../../assets/images/WhitePlusIcon.svg"
+import CircleLeftArrow from "../../assets/images/CircleLeftArrow.svg"
+import CircleRightArrow from "../../assets/images/CircleRightArrow.svg"
 
 const selectedTime = ref(null);
 

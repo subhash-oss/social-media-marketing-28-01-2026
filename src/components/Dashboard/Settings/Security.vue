@@ -1,4 +1,25 @@
 <template>
+  <!-- Show delete comformation popup -->
+  <ConfirmDataDeletionModal
+      :open="showDeleteModal"
+      title="Delete Your Account"
+      description="To confirm, we've sent a 6-digit code to your registered email. Please enter the code below to verify your request. "
+      @close="showDeleteModal = false"
+      @delete="handleDeleteData"
+      @resend="handleResendCode"
+    />
+  
+  <!-- Show Logout Confirmation Modal -->
+  <LogoutConfirmationModal
+    :open="showLogoutModal"
+    title="Log Out From All Devices?"
+    description="This will immediately sign you out from all logged-in devices, including desktop, mobile, and web sessions."
+    additional-info="You'll stay signed in on this current device."
+    confirm-button-text="Log Out All Devices"
+    @close="showLogoutModal = false"
+    @confirm="handleLogoutAllDevices"
+  />
+  
   <!-- Show Create Password Form -->
   <CreatePassword 
     v-if="showCreatePassword && !hasPasswordCreated" 
@@ -45,7 +66,7 @@
           Deleting your account will permanently remove access to all designs.
         </p>
       </div>
-      <button
+      <button @click="showDeleteModal = true"
         class="button_thin px-5 rounded-lg inputbox_border_color bg_white sub_button_semibold"
       >
         Delete account
@@ -61,6 +82,7 @@
         </p>
       </div>
       <button
+        @click="showLogoutModal = true"
         class="button_thin px-5 rounded-lg inputbox_border_color bg_white sub_button_semibold"
       >
         Log Out From All Devices
@@ -86,12 +108,18 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router"
 import CreatePassword from "./CreatePassword.vue";
 import UpdatePassword from "./UpdatePassword.vue";
+import ConfirmDataDeletionModal from "./ConfirmDataDeletionModal.vue";
+import LogoutConfirmationModal from "./LogoutConfirmationModal.vue";
 
+const router = useRouter()
 const showCreatePassword = ref(false);
 const showUpdatePassword = ref(false);
 const hasPasswordCreated = ref(false);
+const showDeleteModal = ref(false);
+const showLogoutModal = ref(false);
 
 const handlePasswordCreated = () => {
   hasPasswordCreated.value = true;
@@ -101,6 +129,29 @@ const handlePasswordCreated = () => {
 const handlePasswordUpdated = () => {
   // Password was updated, you can add any additional logic here
   showUpdatePassword.value = false;
+};
+
+const handleLogoutAllDevices = () => {
+  // Handle logout from all devices logic here
+  console.log("Logging out from all devices");
+  // You can add API call here
+  showLogoutModal.value = false;
+};
+
+const handleDeleteData = (code) => {
+  // Handle data deletion logic here
+  console.log("Deleting account with code:", code);
+  // You can add API call here
+  setTimeout(() => {
+    router.push("/deleted-message")
+  }, 2000);
+  
+};
+
+const handleResendCode = () => {
+  // Handle resend code logic here
+  console.log("Resending verification code");
+  // You can add API call here
 };
 </script>
 

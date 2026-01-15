@@ -10,6 +10,14 @@
       @resend="handleResendCode"
     />
 
+    <!-- Success Toast Notification -->
+    <SuccessToastNotification
+      :open="showSuccessToast"
+      main-message="Your account and all data have been permanently deleted."
+      secondary-message="You'll be signed out shortly."
+      @close="showSuccessToast = false"
+    />
+
     <!-- Header -->
     <h2 class="heading_h6_bold">Data & Privacy Settings</h2>
     <p class="label_1_regular regular_gap medium_mb">
@@ -79,16 +87,23 @@
 <script setup>
 import { ref } from "vue";
 import ConfirmDataDeletionModal from "./ConfirmDataDeletionModal.vue";
+import SuccessToastNotification from "../../common/SuccessToastNotification.vue";
 
 const aiContentLearning = ref(true);
 const analyticsSharing = ref(false);
 const showDeleteModal = ref(false);
+const showSuccessToast = ref(false);
 
 const handleDeleteData = (code) => {
   // Handle data deletion logic here
   console.log("Deleting data with code:", code);
   // You can add API call here
   // Note: Don't close the modal here - the modal will close itself after showing "Deleting..." for 2 seconds
+  
+  // Show success toast after deletion
+  setTimeout(() => {
+    showSuccessToast.value = true;
+  }, 2100); // Show toast after modal closes (2 seconds + small delay)
 };
 
 const handleResendCode = () => {

@@ -10,11 +10,11 @@
   <!-- Popup -->
   <div
     v-if="open"
-    class="fixed inset-0 z-50 bg-white shadow-2xl lg:inset-auto lg:top-2 lg:rounded-xl lg:w-[40%]"
+    class="fixed inset-0 z-50 bg_white shadow-2xl h-[100%] md:h-[98%] lg:inset-auto lg:top-2 lg:rounded-xl lg:w-[40%] common_inner_gap"
     :class="isCollapsed ? 'lg:left-20' : 'lg:left-[16.5em]'"
   >
     <!-- Header -->
-    <div class="flex items-start justify-between border-b p-4">
+    <div class="flex items-start justify-between ">
       <div>
         <h2 class="heading_h6_semibold">Notifications</h2>
         <p class="body_3_regular">
@@ -28,25 +28,26 @@
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-2 border-b bg-[#F1F2F4] px-4 py-3">
+    <div class="flex common_gap gap-7 bg_secondary_color px-2 py-1 rounded-lg overflow-x-auto lg:justify-center lg:overflow-x-visible scrollbar-hide">
       <button
         v-for="tab in tabs"
         :key="tab.key"
         @click="activeTab = tab.key"
-        class="flex items-center gap-1 rounded-md px-2 py-1"
+        class="flex items-center gap-1 rounded-md px-2 py-1 flex-shrink-0"
         :class="
           activeTab === tab.key
             ? 'bg-white'
             : 'hover:bg-gray-100'
         "
       >
-        <span class="label_2_semibold">{{ tab.label }}</span>
-        <span class="label_3_regular">({{ tab.count }})</span>
+        <span class="label_2_semibold whitespace-nowrap">{{ tab.label }}</span>
+        <span class="label_3_regular whitespace-nowrap">({{ tab.count }})</span>
       </button>
     </div>
 
+    <div class="block h-[2px] w-full bg_primary_color common_gap"></div>
     <!-- CONTENT -->
-    <div class="p-4">
+    <div class="common_gap">
       <!-- EMPTY STATE -->
       <div
         v-if="filteredNotifications.length === 0"
@@ -68,21 +69,21 @@
       <!-- NOTIFICATION LIST -->
       <div
         v-else
-        class="max-h-[59vh] space-y-2 overflow-y-auto"
+        class="max-h-[100%] space-y-5 overflow-y-auto h-[65vh] md:h-70vh"
       >
         <div
           v-for="item in filteredNotifications"
           :key="item.id"
-          class="relative rounded-lg border p-4"
+          class="relative rounded-lg primary_border_color common_inner_gap bg_primary_color"
         >
           <!-- Status Dot -->
           <span
-            class="absolute right-3 top-2 h-2 w-2 rounded-full bg-[#155DFC]"
+            class="absolute right-3 top-2 h-2 w-2 rounded-full bg_notification"
           ></span>
 
           <!-- Title -->
           <div class="mb-1 flex items-center gap-2">
-            <p class="label_2_semibold">{{ item.title }}</p>
+            <p class="label_2_semibold primary_text_color">{{ item.title }}</p>
 
             <span
               class="rounded px-2 py-[2px] caption_1_medium"
@@ -93,12 +94,12 @@
           </div>
 
           <!-- Description -->
-          <p class="label_2_regular">
+          <p class="label_2_regular normal_gap">
             {{ item.description }}
           </p>
 
           <!-- Time -->
-          <p class="body_4_regular">
+          <p class="body_4_regular normal_gap">
             {{ item.time }}
           </p>
         </div>
@@ -108,7 +109,7 @@
     <!-- Footer -->
     <div
       v-if="notifications.length"
-      class="m-2 flex cursor-pointer items-center justify-center gap-2 rounded-md border bg-[#F3F4F6] p-2 text-[#374151]"
+      class="absolute w-[93%] bottom-5 common_gap flex cursor-pointer items-center justify-center gap-2 rounded-md regular_border_color bg_regular_button p-2 text-[#374151]"
       @click="clearAll"
     >
       <img :src="ClearIcon" />
@@ -205,3 +206,14 @@ const clearAll = () => {
   activeTab.value = "all";
 };
 </script>
+
+<style scoped>
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+</style>

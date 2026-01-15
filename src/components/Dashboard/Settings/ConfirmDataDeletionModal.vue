@@ -66,11 +66,11 @@
       </div>
 
       <!-- Footer -->
-      <div class="flex gap-7 common_gap">
+      <div class="flex gap-5 common_gap">
         <button
           @click="$emit('close')"
           :disabled="isDeleting"
-          class="flex-1 rounded-lg button_thin bg_button_secondary sub_button_semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          class="lg:flex-1 rounded-lg button_thin bg_button_secondary sub_button_semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>
