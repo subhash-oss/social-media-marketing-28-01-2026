@@ -91,8 +91,8 @@
           :class="[
             'flex items-center gap-2 rounded-lg px-4 py-3',
             currentStep === 1 && !isStep1Valid 
-              ? 'disabled_primary_button cursor-not-allowed' 
-              : 'primary_button cursor-pointer'
+              ? 'modal_disabled_primary_button cursor-not-allowed' 
+              : 'modal_primary_button cursor-pointer'
           ]"
         >
           <span>{{ currentStep === 3 ? 'Proceed' : 'Continue' }}</span>

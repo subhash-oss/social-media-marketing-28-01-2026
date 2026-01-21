@@ -1,5 +1,5 @@
 <template>
-     <div class="bg_white rounded-2xl common_inner_gap primary_border_color h-[100%] settings_height">
+     <div class="bg_white rounded-2xl common_inner_gap primary_border_color h-[100%] data-privacy-full-height">
             <h2 class="heading_h6_bold">Profile Information</h2>
             <p class="label_1_regular regular_gap medium_mb">
               Update your profile, secure your account, and manage connected apps.

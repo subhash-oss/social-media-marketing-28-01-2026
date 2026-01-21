@@ -22,8 +22,14 @@
  .primary_button_semibold {
   @apply bg-[#7950F2] text-[#ffffff] font-semibold cursor-pointer text-[1em] h-[3em] rounded-[8px] ;
  }
+ .modal_primary_button {
+  @apply bg-[#7950F2] text-[#ffffff] font-bold cursor-pointer text-[0.875em] rounded-[8px] ;
+ }
   .disabled_primary_button {
     @apply bg-[#7950F2] text-[#ffffff] font-bold cursor-pointer text-[1em] h-[3em] rounded-[8px] opacity-50;
+  }
+   .modal_disabled_primary_button {
+    @apply bg-[#7950F2] text-[#ffffff] font-bold cursor-pointer text-[0.875em] rounded-[8px] opacity-50;
   }
   
   .gradient_text_color{
@@ -238,7 +244,7 @@
   }
   /* --------------------------------------------------------------------------------------- */
   .brand_section_height{
-    height: 100%;
+    @apply h-[100%]
   }
   .publish_text_style{
     @apply text-[#1D7AFC] bg-[#E9F2FF]

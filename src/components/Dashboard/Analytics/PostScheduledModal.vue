@@ -31,7 +31,7 @@
         </button>
         <button
           @click="handleDone"
-          class="primary_button flex items-center justify-center gap-2 py-3 px-5 rounded-lg"
+          class="modal_primary_button flex items-center justify-center gap-2 py-3 px-5 rounded-lg "
         >
           Done
           <img :src="DoneArrowRight" alt="">

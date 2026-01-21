@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl bg_white common_inner_gap shadow-sm h-[100%] settings_height">
+  <div class="rounded-2xl bg_white common_inner_gap shadow-sm h-[100%] data-privacy-full-height">
     <!-- Header -->
     <h2 class="heading_h6_bold">Billing & Plan</h2>
     <p class="label_1_regular regular_gap medium_mb">

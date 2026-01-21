@@ -10,7 +10,7 @@
   <!-- Popup -->
   <div
     v-if="open"
-    class="fixed z-50 bg_white shadow-sm profile_border bottom-[4.4em] w-64 lg:inset-auto lg:top-auto  popup_position lg:rounded-xl lg:w-56 px-2 py-4 "
+    class="fixed z-50 bg_white shadow-sm profile_border bottom-[4.4em] w-64 lg:inset-auto lg:top-auto  popup_position lg:rounded-xl lg:w-52 px-2 py-4 "
     :class="[
       isCollapsed ? 'left-4 lg:left-5' : 'left-4 lg:left-4',
       'rounded-xl'

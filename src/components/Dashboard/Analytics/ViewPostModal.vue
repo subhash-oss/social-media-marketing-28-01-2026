@@ -7,7 +7,7 @@
   >
     <!-- Modal - Positioned on the right -->
     <div
-      class="fixed right-0 top-48 bottom-0 w-full md:top-0 hide-scrollbar md:max-w-lg  max-h-screen overflow-y-auto bg_white shadow-2xl"
+      class="fixed right-0 bottom-0 w-full top-0 hide-scrollbar md:max-w-lg  max-h-screen overflow-y-auto bg_white shadow-2xl"
       @click.stop
     >
       <!-- Header -->
@@ -53,7 +53,7 @@
             <!-- Platform Dropdown -->
             <div
               v-if="showPlatformDropdown"
-              class="absolute left-0 top-8 z-50 min-w-[180px] rounded-lg bg_white shadow-lg primary_border_color py-2"
+              class="absolute right-0 md:left-0 top-8 z-50 min-w-[180px] rounded-lg bg_white shadow-lg primary_border_color py-2"
             >
               <div
                 v-for="platform in availablePlatforms"

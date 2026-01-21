@@ -10,8 +10,57 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, and Opera */
 }
-.settings_height{
-    min-height: 76vh;
+
+.data-privacy-full-height {
+  /* Full viewport height minus header, padding, and tabs navigation */
+  min-height: calc(100vh - 200px);
+}
+
+
+/* scrollbar size */
+.custom_scrollbar::-webkit-scrollbar {
+  width: 4px; /* Chrome/Safari - hide by default */
+}
+
+/* track */
+.custom_scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 80px 0px 50px 0px;          /* gap top & bottom */
+  border-radius: 10px;
+  
+}
+
+/* thumb */
+.custom_scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+.custom_scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #8a8a8a;
+}
+
+/* Show on aside hover */
+aside:hover .custom_scrollbar::-webkit-scrollbar-thumb {
+  background-color: #c4c7ce;
+}
+
+aside:hover .custom_scrollbar::-webkit-scrollbar-track {
+  background: #ebebeb;
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .data-privacy-full-height {
+    min-height: calc(100vh - 220px);
+  }
+}
+
+/* Large screen adjustments */
+@media (min-width: 1024px) {
+  .data-privacy-full-height {
+    min-height: calc(100vh - 140px);
+  }
 }
 /* Hide text on md screens for product select, show only icon and arrow */
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -35,11 +84,6 @@
   }
   .popup_position {
     bottom: 6em !important;
-  }
-}
-@media (min-width: 1500px) and (max-width: 5000px) {
-  .settings_height{
-    min-height: 84vh;
   }
 }
 .sidebar_bottom_section{

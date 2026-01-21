@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl bg_white common_inner_gap shadow-sm h-[100%] settings_height"> 
+  <div class="rounded-2xl bg_white common_inner_gap shadow-sm h-[100%] data-privacy-full-height"> 
     <!-- Delete Confirmation Modal -->
     <ConfirmDataDeletionModal
       :open="showDeleteModal"
@@ -112,4 +112,5 @@ const handleResendCode = () => {
   // You can add API call here
 };
 </script>
+
 

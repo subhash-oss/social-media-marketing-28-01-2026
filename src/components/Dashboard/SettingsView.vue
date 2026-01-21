@@ -28,7 +28,7 @@
         <!-- Tabs Container -->
         <div 
           ref="tabsContainer"
-          class="flex gap-1 md:gap-5 overflow-x-auto scrollbar-hide md:overflow-visible scroll-smooth mx-auto"
+          class="flex gap-1 md:gap-5 overflow-x-auto scrollbar-hide lg:overflow-visible scroll-smooth mx-auto"
           @scroll="checkScrollPosition"
         >
           <button
