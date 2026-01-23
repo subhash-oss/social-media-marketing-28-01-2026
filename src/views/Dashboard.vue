@@ -6,6 +6,7 @@
       :activeTab="activeTab"
       @changeTab="activeTab = $event"
       @collapseChange="isSidebarCollapsed = $event"
+      @newChat="handleNewChat"
     />
 
     <!-- Mobile Sidebar -->
@@ -14,6 +15,7 @@
       :activeTab="activeTab"
       @close="showMobileSidebar = false"
       @changeTab="handleTabChange"
+      @newChat="handleNewChat"
     />
 
     <!-- Main Area -->
@@ -32,7 +34,7 @@
 
       <!-- Content -->
       
-        <ChatView v-if="activeTab === 'chat'" />
+        <ChatView v-if="activeTab === 'chat'" :resetChat="resetChatFlag" :isSidebarCollapsed="isSidebarCollapsed" @reset-complete="resetChatFlag = false" />
         <CalendarView v-else-if="activeTab === 'calendar'" />
         <AnalyticsView v-else-if="activeTab === 'analytics'" />
         <ProductsView v-else-if="activeTab === 'products'" />
@@ -63,6 +65,7 @@ const router = useRouter();
 const activeTab = ref("chat");
 const showMobileSidebar = ref(false);
 const isSidebarCollapsed = ref(false);
+const resetChatFlag = ref(false);
 
 // Check query parameter on mount and route changes
 const checkTabQuery = () => {
@@ -87,5 +90,9 @@ watch(() => route.query, () => {
 const handleTabChange = (tab) => {
   activeTab.value = tab;
   showMobileSidebar.value = false;
+};
+
+const handleNewChat = () => {
+  resetChatFlag.value = true;
 };
 </script>

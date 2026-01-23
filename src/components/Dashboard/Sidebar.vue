@@ -47,7 +47,7 @@
       :ref="el => { if (el) menuItemRefs['chat'] = el }"
     >
       <button
-        @click="handleSidebarClick('chat')"
+        @click="handleNewChatClick"
         class="flex w-full items-center gap-2 rounded-md secondary_bg_color secondary_text_color px-3 py-3 label_1_bold"
         :class="isCollapsed ? 'justify-center' : ''"
       >
@@ -208,7 +208,7 @@ defineProps({
   activeTab: String,
 });
 
-const emit = defineEmits(["changeTab", "collapseChange"]);
+const emit = defineEmits(["changeTab", "collapseChange", "newChat"]);
 const changeTab = (tab) => emit("changeTab", tab);
 
 const isCollapsed = ref(false);
@@ -222,6 +222,17 @@ const handleSignOut = () => {
   // Handle sign out logic here
   console.log("Sign out clicked");
   // You can add router navigation or API call here
+};
+
+const handleNewChatClick = () => {
+  // Close user account popup if open
+  if (showUserAccount.value) {
+    showUserAccount.value = false;
+  }
+  
+  // Switch to chat tab and emit newChat event
+  changeTab('chat');
+  emit('newChat');
 };
 
 const handleSidebarClick = (tab) => {

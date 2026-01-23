@@ -1,16 +1,5 @@
 <template>
 
-   <div class="block md:hidden">
-     <p class="caption_2_medium text-start mt-20">
-      Start with the example below
-    </p>
-   </div>
-   <div class="block md:hidden flex text-center justify-center gap-5 mb-[-2.5em] py-3">
-    <p class="caption_2_semibold primary_text_color cursor-pointer px-2 py-3 bg_white rounded-lg">Set Up Your Brand</p>
-    <p class="caption_2_semibold primary_text_color cursor-pointer px-2 py-3 bg_white rounded-lg">Plan Weekly Posts</p>
-    <p class="caption_2_semibold primary_text_color cursor-pointer px-2 py-3 bg_white rounded-lg">Create Social Posts</p>
-   </div>
-
   <div
     class="mx-auto mt-10 max-w-3xl rounded-xl bg-gradient-to-r from-[#CD519D] to-[#7950F2] p-[1px] shadow-lg"
   >
@@ -22,8 +11,10 @@
       <input
         v-model="prompt"
         type="text"
-        placeholder="What’s on your mind?"
+        placeholder="What's on your mind?"
         class="w-full border-none outline-none Body_2_Medium"
+        :class="prompt ? 'primary_text_color' : ''"
+        @keyup.enter="handleSend"
       />
 
       <!-- Toolbar -->
@@ -121,9 +112,10 @@
           </div>
         </div>
 
-        <!-- Mic -->
-        <button class="rounded-full">
-          <img :src="MikeIcon" alt="" />
+        <!-- Mic / Send -->
+        <button class="rounded-full" @click="handleSend">
+          <img v-if="!prompt.trim()" :src="MikeIcon" alt="Microphone" />
+          <img v-else :src="SendIcon" alt="">
         </button>
       </div>
 
@@ -149,6 +141,10 @@ import AttachmentIcon from "../../assets/images/AttachmentIcon.svg";
 import GeminiIcon from "../../assets/images/GeminiIcon.svg";
 import DownArrow from "../../assets/images/DownArrow.svg";
 import MikeIcon from "../../assets/images/MikeIcon.svg";
+import SendIcon from "../../assets/images/SendIcon.svg";
+
+/* Emit */
+const emit = defineEmits(['send-message']);
 
 /* Prompt */
 const prompt = ref("");
@@ -233,6 +229,19 @@ const selectModel = (model) => {
 
 const handleFiles = (e) => {
   files.value = Array.from(e.target.files);
+};
+
+const handleSend = () => {
+  if (prompt.value.trim()) {
+    emit('send-message', {
+      text: prompt.value.trim(),
+      product: selectedProduct.value,
+      model: selectedModel.value,
+      files: files.value
+    });
+    prompt.value = "";
+    files.value = [];
+  }
 };
 
 /* Click outside handler */

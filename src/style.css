@@ -139,3 +139,6 @@ aside:hover .custom_scrollbar::-webkit-scrollbar-track {
 .chart-scroll-container::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+.border_transparent .relative > div[class*="absolute"] {
+  border: 1px solid transparent !important;
+}

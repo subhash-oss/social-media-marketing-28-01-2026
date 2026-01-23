@@ -25,7 +25,7 @@
     <div class="block h-[2px] w-full bg_primary_color common_gap"></div>
     <!-- New Chat -->
     <button
-      @click="handleSidebarClick('chat')"
+      @click="handleNewChatClick"
       class="mb-6 w-full rounded-md secondary_bg_color py-3 text-sm font-medium secondary_text_color secondary_label_medium flex gap-2 common_gap"
     >
       <img :src="PlusIcon" alt="" class="ml-3"> New Chat
@@ -130,7 +130,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(["changeTab", "close"]);
+const emit = defineEmits(["changeTab", "close", "newChat"]);
 
 const select = (tab) => emit("changeTab", tab);
 
@@ -140,6 +140,16 @@ const handleSignOut = () => {
   // Handle sign out logic here
   console.log("Sign out clicked");
   // You can add router navigation or API call here
+};
+
+const handleNewChatClick = () => {
+  // Close user account popup if open
+  if (showUserAccount.value) {
+    showUserAccount.value = false;
+  }
+  // Switch to chat tab and emit newChat event
+  select('chat');
+  emit('newChat');
 };
 
 const handleSidebarClick = (tab) => {

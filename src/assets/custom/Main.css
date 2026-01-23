@@ -35,6 +35,10 @@
   .gradient_text_color{
     @apply bg-gradient-to-r from-[#CD519D] to-[#7950F2] bg-clip-text text-transparent ;
   }
+  .promptbox_gradient_text_color {
+    @apply bg-gradient-to-r from-[#CD519D] to-[#7950F2] bg-clip-text text-transparent ;
+  }
+
   .disable_text_color{
     @apply text-[#B3B9C4]
   }
@@ -104,6 +108,9 @@
   .Body_2_Medium {
     @apply font-medium text-[1em] text-[#8590A2]
   }
+  .Body_2_regular {
+    @apply font-normal text-[1em]
+  }
   .body_3_regular{
     @apply font-normal text-[0.875em] text-[#1F2937]
   }
@@ -170,6 +177,9 @@
   .bg_regular_button{
     @apply bg-[#F3F4F6]
   }
+  .bg_tooltip_color{
+    @apply bg-[#38414A]
+  }
   .hashtag_text_color{
     @apply text-[#845EF7]
   }
@@ -196,6 +206,9 @@
   }
   .brand_border_color{
   @apply border border-[#6E5DC6]
+  }
+  .tooltip_border_color{
+    @apply border-t-[#38414A]
   }
   .profile_tab_border{
     @apply border border-[#E5DBFF]
