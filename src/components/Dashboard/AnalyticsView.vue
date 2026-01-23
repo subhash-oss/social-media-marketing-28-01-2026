@@ -40,7 +40,7 @@ const baseStats = [
     valueDay: '50K',
     valueWeek: '200K',
     valueMonth: '128K',
-    valueCustom: '128K',
+    valueCustom: '125K',
   },
   {
     title: 'Engagement rate',
@@ -52,7 +52,7 @@ const baseStats = [
     valueDay: '4.2%',
     valueWeek: '5.5%',
     valueMonth: '6.8%',
-    valueCustom: '6.8%',
+    valueCustom: '6.9%',
   },
   {
     title: 'Followers gained',
@@ -64,7 +64,7 @@ const baseStats = [
     valueDay: '+200',
     valueWeek: '+800',
     valueMonth: '+1,230',
-    valueCustom: '+1,230',
+    valueCustom: '+1,630',
   },
   {
     title: 'Posts published',
@@ -76,7 +76,7 @@ const baseStats = [
     valueDay: '5',
     valueWeek: '15',
     valueMonth: '32',
-    valueCustom: '32',
+    valueCustom: '39',
   },
 ];
 
