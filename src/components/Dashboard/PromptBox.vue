@@ -1,7 +1,10 @@
 <template>
 
   <div
-    class="mx-auto mt-10 max-w-3xl rounded-xl bg-gradient-to-r from-[#CD519D] to-[#7950F2] p-[1px] shadow-lg"
+    :class="[
+      'mx-auto mt-10 max-w-3xl rounded-xl p-[1px] shadow-md shadow-[#c0aef7]',
+      isInputFocused ? 'gradient-border-static' : 'gradient-border-animated'
+    ]"
   >
 
    
@@ -15,6 +18,8 @@
         class="w-full border-none outline-none Body_2_Medium"
         :class="prompt ? 'primary_text_color' : ''"
         @keyup.enter="handleSend"
+        @focus="isInputFocused = true"
+        @blur="isInputFocused = false"
       />
 
       <!-- Toolbar -->
@@ -148,6 +153,7 @@ const emit = defineEmits(['send-message']);
 
 /* Prompt */
 const prompt = ref("");
+const isInputFocused = ref(false);
 
 /* Products */
 const products = ["All products", "Instagram", "LinkedIn", "Twitter"];
@@ -320,3 +326,34 @@ onUnmounted(() => {
   window.removeEventListener("scroll", handleResize, true);
 });
 </script>
+
+<style scoped>
+  /* border animation styles */
+.gradient-border-animated {
+  background: linear-gradient(
+    90deg,
+    #CD519D 0%,
+    #7950F2 20%,
+    #CD519D 40%,
+    #7950F2 60%,
+    #CD519D 80%,
+    #7950F2 100%
+  );
+  background-size: 200% 100%;
+  animation: gradient-run 1s linear infinite;
+}
+
+.gradient-border-static {
+  background: linear-gradient(to right, #CD519D, #7950F2);
+  animation: none;
+}
+
+@keyframes gradient-run {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+</style>
