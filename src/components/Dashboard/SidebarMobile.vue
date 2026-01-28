@@ -161,6 +161,8 @@ const handleSidebarClick = (tab) => {
   }
   // Handle the tab click
   select(tab);
+  // Close mobile sidebar after selecting
+  emit('close');
 };
 
 const handleSidebarContainerClick = (event) => {

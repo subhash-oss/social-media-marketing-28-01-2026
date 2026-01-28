@@ -117,6 +117,16 @@ watch(() => route.path, () => {
 });
 
 const handleTabChange = (tab) => {
+  // Set activeTab first
+  activeTab.value = tab;
+  
+  // For notifications, don't navigate (no route), just close mobile sidebar
+  if (tab === 'notifications') {
+    showMobileSidebar.value = false;
+    return;
+  }
+  
+  // For other tabs, navigate to route
   navigateToTab(tab);
   showMobileSidebar.value = false;
 };

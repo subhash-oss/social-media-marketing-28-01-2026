@@ -2,15 +2,15 @@
   <!-- Backdrop -->
   <div
     v-if="open"
-    class="fixed top-0 bottom-0 right-0 z-40 bg-black/40"
-    :class="isCollapsed ? 'left-16' : 'left-64'"
+    class="fixed inset-0 z-40 bg-black/40 lg:inset-auto lg:top-0 lg:bottom-0 lg:right-0"
+    :class="isCollapsed ? 'lg:left-16' : 'lg:left-64'"
     @click="$emit('close')"
   ></div>
 
   <!-- Popup -->
   <div
     v-if="open"
-    class="fixed inset-0 z-50 bg_white shadow-2xl h-[100%] md:h-[98%] lg:inset-auto lg:top-2 lg:rounded-xl lg:w-[40%] common_inner_gap"
+    class="fixed inset-0 z-50 bg_white shadow-2xl h-[100%] lg:h-[98%] lg:inset-auto lg:top-2 lg:rounded-xl lg:w-[40%] common_inner_gap"
     :class="isCollapsed ? 'lg:left-20' : 'lg:left-[16.5em]'"
   >
     <!-- Header -->
