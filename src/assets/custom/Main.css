@@ -96,6 +96,9 @@
   .label_3_medium{
     @apply font-medium text-[0.75em] text-[#555963] tracking-[-0.12px]
   }
+  .label_3_semibold{
+    @apply font-semibold text-[0.75em] 
+  }
   .sub_button_semibold{
     @apply text-[0.875em] font-semibold tracking-[0.16px] text-[#1D2125];
   }
@@ -210,6 +213,10 @@
   .tooltip_border_color{
     @apply border-t-[#38414A]
   }
+
+  .selected_calendar_border{
+    @apply border border-[#7048E8]
+  }
   .profile_tab_border{
     @apply border border-[#E5DBFF]
   }
@@ -246,6 +253,9 @@
   .paragraph_p5_regular{
     @apply font-normal text-[0.875em] text-[#555963]
   }
+  .paragraph_sm{
+    @apply text-[0.625em]
+  }
   .title_1_semibold{
     @apply font-semibold text-[0.85em] text-[#232323]
   }
@@ -268,6 +278,15 @@
   .approve_text_style{
     @apply text-[#22A06B] bg-[#DCFFF1]
   }
+
+   .pending_text_color{
+    @apply text-[#E56910]
+  }
+  .approve_text_color{
+    @apply text-[#22A06B] 
+  }
+
+
   .common_gap{
     @apply mt-5
   }
@@ -279,6 +298,9 @@
   }
   .common_inner_gap{
     @apply p-5
+  }
+  .medium_inner_gap{
+    @apply p-3
   }
   .medium_gap{
    @apply mt-3
