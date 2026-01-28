@@ -69,7 +69,7 @@ const resetChatFlag = ref(false);
 
 // Map route paths to tab names
 const routeToTabMap = {
-  '/chat': 'chat',
+  '/chat' : 'chat',
   '/calendar': 'calendar',
   '/analytics': 'analytics',
   '/products': 'products',
