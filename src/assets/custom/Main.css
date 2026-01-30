@@ -348,5 +348,8 @@
 .close_button_style{
   @apply  bg-[#DEE4EA] w-5 h-5 rounded-[50%] p-[2px]
 }
+.selected_platform_border {
+  @apply border border-[#6E5DC6];
+}
 } 
 

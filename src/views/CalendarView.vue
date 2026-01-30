@@ -56,7 +56,7 @@
       <!-- Calendar -->
       <div
         class="rounded-xl bg_white primary_border_color flex-1 relative"
-        :class="selectedDate ? 'md:w-[65%] lg:w-[60%]' : 'w-full'"
+        :class="selectedDate ? 'md:w-[65%] lg:w-[60%] 2xl:w-[70%]' : 'w-full'"
       >
         <!-- Month Header -->
       <div class="flex items-center justify-between border-b p-4 relative z-0">
@@ -128,7 +128,7 @@
       <!-- Right Side Modal Panel -->
       <div
         v-if="selectedDate"
-        class="hidden lg:block w-[30%] h-[35em] lg:w-[35%] rounded-xl bg_white primary_border_color shadow-lg flex-shrink-0 relative z-20 common_inner_gap"
+        class="hidden lg:block w-[30%] h-[35em] lg:w-[40%] 2xl:w-[30%] rounded-xl bg_white primary_border_color shadow-lg flex-shrink-0 relative z-20 common_inner_gap"
       >
         <!-- Post Detail View -->
         <div v-if="selectedPost" class="h-full flex flex-col">
@@ -206,7 +206,7 @@
 
             <!-- Platforms -->
              <p class="label_2_medium medium_gap"> Platforms</p>
-            <div class="flex items-center gap-2 medium_gap">
+            <div class="flex items-center gap-2 medium_gap overflow-auto hide-scrollbar">
               <img
                 v-for="platform in selectedPost.platforms"
                 :key="platform"
@@ -214,7 +214,7 @@
                 :alt="platform"
                 class="w-10 h-10"
               />
-            <span class="primary_border_color rounded-lg secondary_button_thin"> <img :src="ImageEditIcon" alt="" class="w-6 h-6" ></span>
+            <img  @click="openPlatformModal" :src="ImageEditIcon" alt="" class=" primary_border_color rounded-lg secondary_button_thin cursor-pointer w-10 h-10" >
             </div>
 
             <!-- Scheduled For -->
@@ -335,22 +335,23 @@
       @click="closeDateModal"
     >
       <div
-        class="fixed right-0 top-[46%] bottom-0 w-full bg_white shadow-2xl overflow-hidden transform transition-transform duration-300 ease-in-out overflow-y-auto common_inner_gap"
+        class="fixed right-0 top-[46%] bottom-0 w-full bg_white shadow-2xl overflow-hidden transform transition-transform duration-300 ease-in-out overflow-y-auto common_inner_gap rounded-lg"
         @click.stop
       >
         <!-- Post Detail View -->
         <div v-if="selectedPost" class="h-full flex flex-col">
           <!-- Modal Header with Back Button -->
-         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-6">
+         <div>
+            <div class="flex items-center justify-between gap-6">
+              <h2 class="paragraph_p2_medium primary_text_color">Post details</h2>
               <button
                 @click="closePostDetail"
-                class="rounded-full transition-colors"
+                class="transition-colors"
                 aria-label="Back"
               >
-                <img :src="BackButtonArrow" alt="Back">
+                <img :src="closeIcon" alt="Back">
               </button>
-              <h2 class="paragraph_p2_medium primary_text_color">Post details</h2>
+              
             </div>
           </div>
 
@@ -420,7 +421,7 @@
             <!-- Platforms -->
              <div class="md:flex md:items-end md:justify-center">
             <p class="label_2_medium medium_gap md:absolute left-8"> Platforms</p>
-            <div class="flex items-center gap-2 medium_gap">
+            <div class="flex items-center gap-2 medium_gap overflow-auto hide-scrollbar">
               <img
                 v-for="platform in selectedPost.platforms"
                 :key="platform"
@@ -428,8 +429,7 @@
                 :alt="platform"
                 class="w-10 h-10"
               />
-            <span class="primary_border_color rounded-lg secondary_button_thin"> <img :src="ImageEditIcon" alt="" class="w-6 h-6" ></span>
-            </div>
+             <img  @click="openPlatformModal" :src="ImageEditIcon" alt="" class=" primary_border_color rounded-lg secondary_button_thin cursor-pointer w-10 h-10" >            </div>
             </div>
             <!-- Scheduled For -->
             <div class="common_gap medium_inner_gap primary_border_color rounded-lg">
@@ -904,6 +904,14 @@
 
   </div>
 
+  <!-- Social Media Platform Modal -->
+  <SocialMediaModal
+    :open="showPlatformModal"
+    :selected-platforms="selectedPost ? selectedPost.platforms : []"
+    @close="closePlatformModal"
+    @update:selected-platforms="updatePlatforms"
+  />
+
   </main>
 </template>
 
@@ -928,6 +936,9 @@ import PostFilter from "../assets/images/PostFilter.svg"
 import ImageEditIcon from "../assets/images/ImageEditIcon.svg"
 import DotsIcon from "../assets/images/DotsIcon.svg"
 import SaveIcon from "../assets/images/SaveIcon.svg"
+import SocialMediaModal from "../components/Calendar/SocialMediaModal.vue"
+import TikTokIcon from "../assets/images/TikTokIcon.svg"
+import YoutubeIcon from "../assets/images/YoutubeIcon.svg"
 
 const selectedTime = ref(null);
 const selectedDate = ref(null);
@@ -937,6 +948,7 @@ const mobileWeekScrollContainer = ref(null); // Ref for mobile week scroll conta
 const desktopWeekScrollContainer = ref(null); // Ref for desktop week scroll container
 const dayViewScrollContainer = ref(null); // Ref for day view scroll container
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
+const showPlatformModal = ref(false); // State for platform modal
 
 // Update window width on resize
 const handleResize = () => {
@@ -1516,6 +1528,8 @@ const getPlatformIcon = (platform) => {
     facebook: FacebookIcon,
     linkedin: LinkedInIcon,
     twitter: TwitterIcon,
+    tiktok: TikTokIcon,
+    youtube: YoutubeIcon,
   };
   return platformMap[platform.toLowerCase()] || InstagramIcon;
 };
@@ -1572,6 +1586,30 @@ const formatScheduledTime = (post) => {
   }
 
   return `<span class="label_2_medium sub_text_color">Scheduled for </span><span class="body_3_medium primary_text_color"> ${dateLabel} <span class="inline-block w-[1px] h-4 mx-1 xl:mx-2 bg-gray-400 align-middle"></span>${formatTime(post.postTime)}</span>`;
+};
+
+// Platform modal handlers
+const openPlatformModal = () => {
+  if (selectedPost.value) {
+    showPlatformModal.value = true;
+  }
+};
+
+const closePlatformModal = () => {
+  showPlatformModal.value = false;
+};
+
+const updatePlatforms = (platforms) => {
+  if (selectedPost.value) {
+    console.log("platforms",platforms);
+    
+    selectedPost.value.platforms = platforms;
+    // Also update the original post in scheduledPosts
+    const postIndex = scheduledPosts.value.findIndex(p => p.id === selectedPost.value.id);
+    if (postIndex !== -1) {
+      scheduledPosts.value[postIndex].platforms = platforms;
+    }
+  }
 };
 
 
