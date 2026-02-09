@@ -63,25 +63,25 @@
      /* new design system start*/
  /* ================= Heading ================= */
   .heading_h1_medium {
-    @apply font-medium text-[3.5em] leading-[4.25em] tracking-[-0.5px]
+    @apply font-medium text-[3.5em] /*leading-[4.25em]*/ tracking-[-0.5px]
   }
   .heading_h1_semibold {
-    @apply font-semibold text-[3.5em] leading-[4.25em] tracking-[-0.5px]
+    @apply font-semibold text-[3.5em] /*leading-[4.25em]*/ tracking-[-0.5px]
   }
   .heading_h1_bold {
-    @apply font-bold text-[3.5em] leading-[4.25em] tracking-[-0.5px]
+    @apply font-bold text-[3.5em] /*leading-[4.25em]*/ tracking-[-0.5px]
   }
   .heading_h2_medium {
-    @apply font-medium text-[3em] leading-[3.625em] tracking-[-0.4px]
+    @apply font-medium text-[3em] /*leading-[3.625em]*/ tracking-[-0.4px]
   }
   .heading_h2_semibold {
-    @apply font-semibold text-[3em] leading-[3.625em] tracking-[-0.4px]
+    @apply font-semibold text-[3em] /*leading-[3.625em]*/ tracking-[-0.4px]
   }
   .heading_h2_bold {
-    @apply font-bold text-[3em] leading-[3.625em] tracking-[-0.4px]
+    @apply font-bold text-[3em] /*leading-[3.625em]*/ tracking-[-0.4px]
   }
   .heading_h3_medium {
-    @apply font-medium text-[2.5em] leading-[3em] tracking-[-0.3px]
+    @apply font-medium text-[2.5em] /*leading-[3em]*/ tracking-[-0.3px]
   }
   .heading_h3_semibold {
     @apply font-semibold text-[2.5em] tracking-[-0.3px]
@@ -90,31 +90,31 @@
     @apply font-semibold text-[1.75]  tracking-[-0.3px]
   }
   .heading_h3_bold {
-    @apply font-bold text-[2.5em] leading-[3em] tracking-[-0.3px]
+    @apply font-bold text-[2.5em] /*leading-[3em]*/ tracking-[-0.3px]
   }
   .heading_h4_medium {
-    @apply font-medium text-[2em] leading-[2.375em] tracking-[-0.2px]
+    @apply font-medium text-[2em] /*leading-[2.375em]*/ tracking-[-0.2px]
   }
   .heading_h4_semibold {
     @apply font-semibold text-[2em] tracking-[-0.2px]
   }
   .heading_h4_bold {
-    @apply font-bold text-[2em] leading-[2.375em] tracking-[-0.2px]
+    @apply font-bold text-[2em] /*leading-[2.375em]*/ tracking-[-0.2px]
   }
   .heading_h5_semibold {
-    @apply font-semibold text-[1.5em] leading-[1.875em] tracking-[0.18px];
+    @apply font-semibold text-[1.5em] /*leading-[1.875em]*/ tracking-[0.18px];
   }
   .heading_h5_bold {
-    @apply font-bold text-[1.5em] leading-[1.875em] tracking-[-0.15px]
+    @apply font-bold text-[1.5em] /*leading-[1.875em]*/ tracking-[-0.15px]
   }
   .heading_h6_medium {
-    @apply font-medium text-[1.25em] leading-[1.5em]
+    @apply font-medium text-[1.25em] /*leading-[1.5em]*/
   }
   .heading_h6_semibold {
-    @apply font-semibold text-[1.25em] leading-[1.5em]
+    @apply font-semibold text-[1.25em] /*leading-[1.5em]*/
   }
   .heading_h6_bold {
-    @apply font-bold text-[1.25em] leading-[1.5em]
+    @apply font-bold text-[1.25em] /*leading-[1.5em]*/
   }
 
   /* ================= caption ================= */
@@ -233,10 +233,6 @@
   }
 /* new design system end*/
 
-
-
-  
-
   .disable_text_color {
     @apply text-[#bcbdc3]
   }
@@ -342,9 +338,7 @@
     @apply text-[#6B7280] text-[14px] font-medium
   }
 
-  .error_text {
-    @apply text-[#DC2626] text-[0.875em] mt-1;
-  }
+  
 
   .dot_text_style {
     @apply text-[#9CA3AF]
@@ -418,6 +412,9 @@
   .regular_border_color {
     @apply border border-[#D7DBDF]
   }
+  .error_border_color {
+    @apply border-2 border-error-600
+  }
 /* new design system end*/
   .primary_border_color {
     @apply border border-[#F1F2F4]
@@ -467,9 +464,7 @@
     @apply border-2 border-dashed border-[#758195]
   }
 
-  .error_border_color {
-    @apply border border-[#F15B50]
-  }
+  
 
   .error_border {
     @apply border border-[#E2483D]

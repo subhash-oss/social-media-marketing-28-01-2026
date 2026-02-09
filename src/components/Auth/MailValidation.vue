@@ -1,7 +1,11 @@
 <template>
-  <div class="flex min-h-screen items-center justify-center px-6">
+  <div class="flex min-h-screen items-center justify-center px-6xl">
     <div class="w-full max-w-md">
-
+     
+      <!-- Logo -->
+      <div class="block lg:hidden">
+        <Logo />
+      </div>
 
       <!-- Heading -->
       <h2 class="heading_h5_semibold primary_text_color">
@@ -9,13 +13,16 @@
 
       </h2>
 
-      <p class="label_2_regular secondary_text_color mt-3 mb-6">
-        We've sent a message to manu@ibosoninnov.com with a link to activate your account. If you can't find our email, check your spam or junk folder, or click below to resend the email.
+      <p class="body_2_regular secondary_text_color mt-md ">
+        We've sent a message to <span class="primary_text_color body_2_medium">manu@ibosoninnov.com</span> with a link to activate your account. If you can't find our email, check your spam or junk folder, or click below to resend the email.
       </p>
-        <button class="primary_button w-full">Open Email</button>
-        <div class="flex justify-between mt-5">
-            <span class="underline label_2_medium primary_text_color">Resend Verification Email</span> <span class="underline label_2_medium"> <RouterLink to="/signup">Back to Sign Up</RouterLink></span>
+        <button class="primary_button w-full mt-6xl">Open Email</button>
+        <div class="flex justify-between mt-6xl">
+            <span class="underline label_2_semibold primary_text_color">Resend Verification Email</span> <span class="underline label_2_semibold"> <RouterLink to="/signup">Back to Sign Up</RouterLink></span>
         </div>
     </div>
   </div>
 </template>
+<script setup>
+import Logo from "../../components/common/Logo.vue"
+</script>

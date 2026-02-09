@@ -1,12 +1,12 @@
 <template>
   <aside
-    class="fixed left-0 top-0 lg:top-[-20px] h-screen flex flex-col border-r bg_secondary_color transition-all duration-300 z-10"
-    :class="isCollapsed ? 'w-16 px-2' : 'w-64 pl-4 pr-1'"
+    class="fixed left-0 top-0 lg:top-[-20px] h-screen flex flex-col  bg_secondary_color transition-all duration-300 z-10"
+    :class="isCollapsed ? 'w-20 px-3xl' : 'w-60 pl-4xl pr-xs'"
     @click="handleSidebarContainerClick"
   >
-    <div class="flex-1 overflow-y-auto custom_scrollbar pr-3">
+    <div class="flex-1 overflow-y-auto custom_scrollbar ">
     <!-- Logo + Toggle -->
-    <div class=" flex items-center pt-6 lg:pt-12" 
+    <div class=" flex items-center pt-6xl lg:pt-11xl" 
     :class="isCollapsed ? 'justify-center':'justify-between' "
    >
       <div class="flex items-center gap-2">
@@ -38,21 +38,23 @@
         <img :src="SidebarIcon" alt="" />
       </button>
     </div>
- <div class="block h-[2px] w-full bg_primary_color mt-5xl"></div>
+ <div class="block h-[1px] w-full bg-gray-25 mt-6xl"></div>
     <!-- New Chat -->
     <div 
-      class="relative group mt-5xl"
+      class="relative group mt-6xl"
       @mouseenter="hoveredItem = 'chat'"
       @mouseleave="hoveredItem = null"
       :ref="el => { if (el) menuItemRefs['chat'] = el }"
     >
       <button
         @click="handleNewChatClick"
-        class="flex w-full items-center gap-2 rounded-md secondary_bg_color secondary_text_brand_color px-3 py-3 label_1_bold"
+        class="w-full rounded-md secondary_bg_color secondary_text_brand_color px-3 py-3 label_1_bold"
         :class="isCollapsed ? 'justify-center' : ''"
       >
+      <span class="flex gap-2 items-center">
         <img :src="PlusIcon" class="h-4 w-4" />
         <span v-if="!isCollapsed">New Chat</span>
+      </span>
       </button>
 
       <Teleport to="body">

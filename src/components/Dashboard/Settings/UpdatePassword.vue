@@ -47,7 +47,7 @@
             <img v-else :src="EyeCloseIcon" alt="">
           </button>
         </div>
-        <p v-if="errors.currentPassword" class="error_text mt-1">
+        <p v-if="errors.currentPassword" class="label_2_semibold text-error-600 mt-1">
           {{ errors.currentPassword }}
         </p>
       </div>
@@ -78,7 +78,7 @@
             <img v-else :src="EyeCloseIcon" alt="">
           </button>
         </div>
-        <p v-if="errors.newPassword" class="error_text mt-1">
+        <p v-if="errors.newPassword" class="label_2_semibold text-error-600 mt-1">
           {{ errors.newPassword }}
         </p>
       </div>
@@ -109,7 +109,7 @@
             <img v-else :src="EyeCloseIcon" alt="">
           </button>
         </div>
-        <p v-if="errors.confirmPassword" class="error_text mt-1">
+        <p v-if="errors.confirmPassword" class="label_2_semibold text-error-600 mt-1">
           {{ errors.confirmPassword }}
         </p>
       </div>

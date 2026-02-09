@@ -25,7 +25,7 @@
     >
       <!-- Mobile Header -->
       <header
-        class="flex items-center gap-3 bg-transparent px-4 py-3 absolute lg:hidden"
+        class="flex items-center gap-xl bg-transparent px-3xl py-xl absolute lg:hidden"
       >
         <button @click="showMobileSidebar = true" class="text-xl">
           <img :src="MobileMenuIcon" alt="">

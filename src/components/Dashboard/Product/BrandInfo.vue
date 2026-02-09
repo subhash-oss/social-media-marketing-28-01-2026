@@ -36,7 +36,7 @@
             ]"
           />
           <!-- Error Message -->
-          <p v-if="urlError" class="mt-xs body_4_medium error_text flex items-center justify-end">
+          <p v-if="urlError" class="mt-xs body_4_medium label_2_semibold text-error-600 flex items-center justify-end">
            
             {{ urlError }}
           </p>
@@ -221,13 +221,13 @@
           <div class="flex items-center gap-3">
             <!-- Error Icon -->
            <img :src="WarningIcon" alt="">
-            <span class="error_text">
+            <span class="label_2_semibold text-error-600">
               {{ fileError }}
             </span>
           </div>
           <button
             @click="fileError = null"
-            class="error_text"
+            class="label_2_semibold text-error-600"
           >
             <img :src="CloseIcon" alt="">
           </button>
