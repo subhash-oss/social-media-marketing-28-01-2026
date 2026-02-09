@@ -26,7 +26,7 @@
             <div class="relative dropdown-container">
               <button
                 @click.stop="toggleDropdown"
-                class="h-9 w-9 rounded-lg profile_border dot_text_style flex items-center justify-center"
+                class="h-9 w-9 rounded-lg profile_border text-black-50 flex items-center justify-center"
               >
                 ⋯
               </button>

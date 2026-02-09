@@ -23,7 +23,7 @@
                 </button>
                 <!-- Speech Bubble Tooltip -->
                 <div class=" absolute bottom-full left-1/2 -translate-x-1/2 mb-2 invisible group-hover/button:visible transition-all duration-200 pointer-events-none whitespace-nowrap z-[1000] ">
-                  <div class="relative bg_tooltip_color text-white label_2_medium rounded-lg px-2 py-2  outline-none ring-0">
+                  <div class="relative bg-black-400 text-white label_2_medium rounded-lg px-2 py-2  outline-none ring-0">
                     Copy
                     <!-- Speech Bubble Tail -->
                     <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
@@ -43,7 +43,7 @@
                 </button>
                 <!-- Speech Bubble Tooltip -->
                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 invisible group-hover/button:visible transition-all duration-200 pointer-events-none whitespace-nowrap z-[1000]">
-                  <div class="relative bg_tooltip_color text-white label_2_medium rounded-lg px-2 py-2 outline-none ring-0">
+                  <div class="relative bg-black-400 text-white label_2_medium rounded-lg px-2 py-2 outline-none ring-0">
                     Edit
                     <!-- Speech Bubble Tail -->
                     <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-px">

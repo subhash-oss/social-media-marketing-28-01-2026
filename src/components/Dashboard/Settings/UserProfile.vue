@@ -152,7 +152,7 @@
   <!-- Profile Picture Upload & Crop Modal -->
   <div
     v-if="editProfilePicture"
-    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    class="fixed inset-0 z-[60] flex items-center justify-center bg_overlay backdrop-blur-sm"
     @click.self="closeProfilePictureModal"
   >
     <div

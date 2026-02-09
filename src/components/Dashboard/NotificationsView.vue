@@ -2,7 +2,7 @@
   <!-- Backdrop -->
   <div
     v-if="open"
-    class="fixed inset-0 z-40 bg-black/40 lg:inset-auto lg:top-0 lg:bottom-0 lg:right-0"
+    class="fixed inset-0 z-40 bg_overlay lg:inset-auto lg:top-0 lg:bottom-0 lg:right-0"
     :class="isCollapsed ? 'lg:left-16' : 'lg:left-64'"
     @click="$emit('close')"
   ></div>

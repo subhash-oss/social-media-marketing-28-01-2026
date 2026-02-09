@@ -1,7 +1,7 @@
 <template>
   <!-- Overlay -->
   <div
-    class="fixed inset-0 z-40 bg-black/40 lg:hidden transition-opacity duration-300 ease-in-out"
+    class="fixed inset-0 z-40 bg_overlay lg:hidden transition-opacity duration-300 ease-in-out"
     :class="{ 'opacity-0': !isOpen, 'pointer-events-none': !isOpen }"
     @click="$emit('close')"
   ></div>
@@ -14,47 +14,49 @@
   >
     <!-- Header -->
     <div class=" flex items-center justify-between">
-      <div class="flex items-center gap-2 heading_h5_semibold gradient_text_color">
+      <div class="flex items-center gap-lg heading_h5_semibold gradient_text_color">
         <div
           class="h-6 w-6 rounded-full bg-gradient-to-r from-pink-500 to-purple-600"
         ></div>
         Genius AI
       </div>
-      <button @click="$emit('close')" class="text-xl">✕</button>
+      <button @click="$emit('close')" class="text-xl secondary_text_color">✕</button>
     </div>
-    <div class="block h-[2px] w-full bg_primary_color mt-5xl"></div>
+    <div class="block h-[1px] w-full bg-gray-25 mt-6xl"></div>
     <!-- New Chat -->
-    <button
-      @click="handleNewChatClick"
-      class="mb-6 w-full rounded-md secondary_bg_color py-3 text-sm font-medium secondary_text_brand_color secondary_label_medium flex gap-2 mt-5xl"
-    >
-      <img :src="PlusIcon" alt="" class="ml-3"> New Chat
-    </button>
+    <button class="button-gradient w-full" @click="handleNewChatClick">
+          <span class="flex gap-md items-center w-full p-xl bg_primary_color primary_text_color label_2_semibold"
+           :class="isCollapsed ? 'justify-center' : ''"
+          >
+            <img :src="PlusIcon" class="h-4 w-4" />
+            <span v-if="!isCollapsed">New Chat</span>
+          </span>
+        </button>
 
     <!-- Chat History -->
-    <p class="mb-2 label_2_semibold primary_text_color">Chat history</p>
-    <div class="mb-6 space-y-1 text-sm">
-      <div class="px-2 py-2 body_3_regular secondary_text_color flex justify-between">
-        <span>Create new product</span> <span class="dot_text_style text-2xl mt-[-0.45em]">...</span>
+    <p class="mt-6xl label_3_semibold primary_text_color">Chat history</p>
+    <div class="mt-xl">
+      <div class="cursor-pointer mt-lg p-md md:mt-xl md:p-xl label_2_regular primary_text_color flex justify-between hover:bg-info-50-hover border border-transparent hover:border-gray-50 rounded-lg">
+        <span>Create new product</span> <span class="text-black-50 text-2xl mt-[-0.45em]">...</span>
       </div>
-      <div class=" px-2 py-2 body_3_regular secondary_text_color flex justify-between">
-        <span>Generate marketing plan</span> <span class="dot_text_style text-2xl mt-[-0.45em]">...</span>
+      <div class=" cursor-pointer mt-xl p-xl label_2_regular primary_text_color flex justify-between hover:bg-info-50-hover border border-transparent hover:border-gray-50 rounded-lg">
+        <span>Generate marketing plan</span> <span class="text-black-50 text-2xl mt-[-0.45em]">...</span>
       </div>
-      <div class=" px-2 py-2 body_3_regular secondary_text_color flex justify-between">
-       <span>Create Instagram post</span> <span class="dot_text_style text-2xl mt-[-0.45em]">...</span>
+      <div class=" cursor-pointer mt-xl p-xl label_2_regular primary_text_color flex justify-between hover:bg-info-50-hover border border-transparent hover:border-gray-50 rounded-lg">
+       <span>Create Instagram post</span> <span class="text-black-50 text-2xl mt-[-0.45em]">...</span>
       </div>
     </div>
 
     <!-- Menu -->
-    <nav class="space-y-2 text-sm">
+    <nav class="">
       <div
         v-for="item in menuItems"
         :key="item.tab"
         @click="handleSidebarClick(item.tab)"
-        class="flex cursor-pointer items-center gap-3  px-2 py-2"
+        class="flex cursor-pointer items-center gap-lg  p-xl"
       >
         <img :src="item.icon" alt="">
-        <span v-if="!isCollapsed" class="label_1_medium primary_text_color">{{ item.label }}</span>
+        <span v-if="!isCollapsed" class="label_2_semibold primary_text_color">{{ item.label }}</span>
       </div>
     </nav>
 
@@ -63,10 +65,11 @@
   <div class="sidebar_bottom_section absolute bottom-3"
   :class="isCollapsed ? 'w-[2.875em] ' : 'w-64'">
 
-     <div class="block h-[2px] w-full bg_primary_color " :class="isCollapsed ? 'hidden' : ''"></div>
-    <div
+    <div class="block h-[1px] w-full bg-gray-25 mt-6xl " :class="isCollapsed ? 'hidden' : ''"></div>
+   
+      <div
         @click="handleSidebarClick(notification.tab)"
-        class="relative group flex cursor-pointer items-center gap-3 rounded-md py-2 mt-xs"
+        class="relative group flex cursor-pointer items-center gap-lg rounded-md py-md mt-md"
         :class=" showNotifications ? 'bg_primary_color' : '',
           isCollapsed ? 'justify-center' : 'px-2'
         "
@@ -85,7 +88,7 @@
         </div>
       </div>
 
-      <div class="block h-[2px] w-full bg_primary_color mt-xs"></div>
+      <div class="block h-[1px] w-full bg-gray-25 mt-md"></div>
 
 
     <!-- User -->
@@ -152,6 +155,8 @@ const handleNewChatClick = () => {
   // Navigate to chat and emit newChat event
   router.push('/chat');
   emit('newChat');
+  // Close mobile sidebar after clicking
+  emit('close');
 };
 
 const handleSidebarClick = (tab) => {

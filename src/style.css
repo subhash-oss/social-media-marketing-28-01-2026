@@ -282,4 +282,60 @@ aside:hover .custom_scrollbar::-webkit-scrollbar-track {
   }
 }
 
+/* chat button animation css */
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.button-gradient {
+  --border-size: 1px;
+  --radius: 14px;
+  --angle: 0deg;
+
+  padding: var(--border-size);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: inline-flex;
+  background: transparent;
+
+  /* Smooth animation both directions */
+  transition: --angle 0.6s linear;
+
+  background-image: conic-gradient(
+    from calc(var(--angle) - 45deg),
+
+    #FAB0003D 10deg,
+    #15BE5329 120deg,
+
+    transparent 130deg,
+
+    #0073E6 150deg,
+    #0073E6 150deg,
+
+    transparent 180deg,
+
+    #FAB0003D 280deg,
+    #15BE5329 300deg,
+
+    transparent 290deg,
+
+    #9966FF 320deg,
+    #9966FF 320deg,
+
+    transparent 360deg
+  );
+}
+
+/* Hover rotates forward */
+.button-gradient:hover {
+  --angle: 150deg;
+}
+
+.button-gradient span {
+  border-radius: calc(var(--radius) - var(--border-size));
+}
+
 

@@ -338,11 +338,6 @@
     @apply text-[#6B7280] text-[14px] font-medium
   }
 
-  
-
-  .dot_text_style {
-    @apply text-[#9CA3AF]
-  }
 
   /* background colors */
 
@@ -352,6 +347,15 @@
   }
   .bg_secondary_color {
     @apply bg-[#ffffff]
+  }
+  .bg-info-50-hover{
+    @apply bg-info-50
+  }
+  .bg-gray-50-hover{
+    @apply bg-gray-50
+  }
+  .bg_overlay {
+    background: #16172280;
   }
 /* new design system end*/
   .secondary_bg_color {
@@ -384,10 +388,6 @@
 
   .bg_regular_button {
     @apply bg-[#F3F4F6]
-  }
-
-  .bg_tooltip_color {
-    @apply bg-[#38414A]
   }
 
   .bg_warning_color {
