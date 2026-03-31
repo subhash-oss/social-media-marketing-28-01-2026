@@ -69,9 +69,10 @@
       <button
         type="button"
         class="primary_button w-full mt-6xl"
+        :disabled="isSubmitting"
         @click="handleSubmit"
       >
-        Sign In
+        {{ isSubmitting ? "Signing in..." : "Sign In" }}
       </button>
 
       <!-- Links -->
@@ -95,21 +96,22 @@ import LockIcon from "../../assets/images/LockIcon.svg";
 import EyeCloseIcon from "../../assets/images/EyeCloseIcon.svg";
 import WarningIcon from "../../assets/images/WarningIcon.svg";
 import Logo from "../../components/common/Logo.vue"
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { computed } from "vue";
+import api, { TOKEN_KEY } from "../../services/api";
 
 const route = useRoute()
+const router = useRouter()
 const email = computed(() => {
   const value = route.query?.email
   return typeof value === "string" ? value : ""
 })
 
-console.log("Email from query:", email.value)
-
 /* State */
 const showPassword = ref(false);
 const password = ref("");
 const errorMessage = ref("");
+const isSubmitting = ref(false);
 
 /* Focus State for Floating Labels */
 const focusedFields = reactive({
@@ -130,10 +132,6 @@ watch(() => password.value, (newVal) => {
     actualPassword.value = newVal;
   }
 });
-
-/* Password Regex */
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()_\-+=]).{8,}$/;
 
 /* Toggle Password */
 const togglePassword = () => {
@@ -249,21 +247,62 @@ const inputClass = (error) =>
     ? "error_border_color"
     : "regular_border_color";
 
-/* Submit & Validation */
-const handleSubmit = () => {
+function extractToken(payload) {
+  if (!payload || typeof payload !== "object") return ""
+  return (
+    payload.access_token ||
+    payload.token ||
+    payload.jwt ||
+    payload?.data?.access_token ||
+    payload?.data?.token ||
+    ""
+  )
+}
+
+/* Submit & login */
+const handleSubmit = async () => {
   errorMessage.value = "";
 
-  if (!password.value) {
+  if (!email.value) {
+    errorMessage.value = "Email is missing. Go back and enter your email.";
+    return;
+  }
+
+  if (!showPassword.value) {
+    password.value = actualPassword.value;
+  }
+
+  const pwd = password.value.trim();
+  if (!pwd) {
     errorMessage.value = "Password is required";
     return;
   }
 
-  if (!passwordRegex.test(password.value)) {
-    errorMessage.value =
-      "Oops! The password you entered is incorrect.";
-    return;
-  }
+  if (isSubmitting.value) return;
+  isSubmitting.value = true;
 
+  try {
+    const res = await api.post("/auth/login", {
+      email: email.value,
+      password: pwd,
+    });
+
+    const token = extractToken(res.data);
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    }
+
+    await router.push("/dashboard");
+  } catch (error) {
+    const msg =
+      error?.response?.data?.detail ||
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      "Invalid email or password.";
+    errorMessage.value = typeof msg === "string" ? msg : "Invalid password.";
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 
