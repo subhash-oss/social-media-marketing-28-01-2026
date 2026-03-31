@@ -147,14 +147,17 @@
         <!-- Submit -->
         <button
           type="submit"
-          :disabled="!isFormFilled"
+          :disabled="!isFormFilled || isSubmitting"
           class="w-full rounded-md py-md font-medium transition mt-6xl"
-          :class="isFormFilled
+          :class="isFormFilled && !isSubmitting
             ? 'primary_button'
             : 'disabled_primary_button'"
         >
-          Create Account
+          {{ isSubmitting ? "Creating Account..." : "Create Account" }}
         </button>
+        <p v-if="submitError" class="label_2_semibold text-error-600 mt-md">
+          {{ submitError }}
+        </p>
       </form>
 
       <!-- Footer -->
@@ -180,6 +183,7 @@ import EyeOpenIcon from "../../assets/images/EyeOpen.svg"
 import Logo from "../../components/common/Logo.vue"
 import EyeCloseIcon from "../../assets/images/EyeCloseIcon.svg"
 import WarningIcon from "../../assets/images/WarningIcon.svg"
+import api from "../../services/api"
 
 const router = useRouter()
 
@@ -213,6 +217,8 @@ const passwordRegex =
 
 /* Password Toggle */
 const showPassword = ref(false)
+const isSubmitting = ref(false)
+const submitError = ref("")
 const togglePassword = () => {
   // Sync before toggling
   if (showPassword.value) {
@@ -352,11 +358,12 @@ const inputClass = (error) =>
     : "regular_border_color"
 
 /* Submit → FULL validation happens here */
-const handleSubmit = () => {
+const handleSubmit = async () => {
   errors.name = ""
   errors.email = ""
   errors.password = ""
   errors.terms = ""
+  submitError.value = ""
 
   let isValid = true
 
@@ -388,8 +395,28 @@ const handleSubmit = () => {
   }
 
   if (isValid) {
-    router.push("/email-validation")
+  try {
+    isSubmitting.value = true
+
+ const response = await api.post("/auth/register", {
+      email: form.email.trim(),
+      password: form.password,
+      username: form.name.trim(),
+      full_name: form.name.trim(),
+    })
+
+      router.push({
+        path: "/email-validation",
+        query: { email: form.email },
+      })
+  } catch (error) {
+    submitError.value =
+      error?.response?.data?.message ||
+      "Unable to create account. Please try again."
+  } finally {
+    isSubmitting.value = false
   }
-  }
+}
+}
 </script>
 

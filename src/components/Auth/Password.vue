@@ -95,6 +95,16 @@ import LockIcon from "../../assets/images/LockIcon.svg";
 import EyeCloseIcon from "../../assets/images/EyeCloseIcon.svg";
 import WarningIcon from "../../assets/images/WarningIcon.svg";
 import Logo from "../../components/common/Logo.vue"
+import { useRoute } from "vue-router";
+import { computed } from "vue";
+
+const route = useRoute()
+const email = computed(() => {
+  const value = route.query?.email
+  return typeof value === "string" ? value : ""
+})
+
+console.log("Email from query:", email.value)
 
 /* State */
 const showPassword = ref(false);

@@ -89,6 +89,7 @@ import { useRouter } from "vue-router"
 import GoogleSignin from "../../components/Auth/GoogleSignin.vue"
 import Logo from "../../components/common/Logo.vue"
 import WarningIcon from "../../assets/images/WarningIcon.svg"
+import api from "../../services/api"
 
 const router = useRouter()
 
@@ -117,7 +118,7 @@ const inputClass = (error) =>
     : "regular_border_color"
 
 /* Submit Handler */
-const handleSubmit = () => {
+const handleSubmit = async () => {
   errors.email = ""
 
   if (!form.email) {
@@ -129,7 +130,25 @@ const handleSubmit = () => {
     errors.email = "Enter a valid email address"
     return
   }
+  
+  if (form.email) {
+    try {
+      const res = await api.post("/auth/check-account", { email: form.email })
+      console.log("res", res);
+      if (res.data.status) {
+        router.push({
+          path: "/password",
+          query: { email: form.email },
+        })
+        return
+      }
 
-  router.push("/password")
+      errors.email = res.data.message || "Unable to continue with this email."
+    } catch (error) {
+      errors.email = error?.response?.data?.message || "Something went wrong. Please try again."
+    }
+  }
+
+  
 }
 </script>
