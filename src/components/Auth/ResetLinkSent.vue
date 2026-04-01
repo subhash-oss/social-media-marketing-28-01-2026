@@ -16,7 +16,9 @@
       <p class="body_2_regular secondary_text_color mt-md ">
             We’ve sent a password reset link to your email address.
       </p>
-        <button class="primary_button w-full mt-6xl"><RouterLink to="/reset-password">Update Password</RouterLink></button>
+        <button class="primary_button w-full mt-6xl" @click="openEmail">
+          Open Email
+        </button>
         <div class="flex justify-between mt-6xl">
             <span class="underline label_2_semibold primary_text_color"><RouterLink to="/forgot-password">Resend Link</RouterLink></span> <span class="underline label_2_semibold primary_text_color"> <RouterLink to="/signin">Back to Sign In</RouterLink></span>
         </div>
@@ -26,4 +28,8 @@
 <script setup>
     import EmailOpen from '../../assets/images/EmailOpenIcon.svg';
     import Logo from "../../components/common/Logo.vue"
+
+    const openEmail = () => {
+      window.open("https://mail.google.com", "_blank", "noopener,noreferrer")
+    }
 </script>

@@ -79,6 +79,7 @@ import Logo from "../../components/common/Logo.vue";
 import { useRouter } from "vue-router";
 import LockIcon from "../../assets/images/LockIcon.svg";
 import WarningIcon from "../../assets/images/WarningIcon.svg";
+import api from "../../services/api";
 
 const router = useRouter();
 
@@ -107,7 +108,7 @@ const inputClass = (error) =>
     : "regular_border_color";
 
 /* Submit Handler */
-const handleSubmit = () => {
+const handleSubmit = async () => {
   errors.email = "";
 
   if (!form.email) {
@@ -119,8 +120,32 @@ const handleSubmit = () => {
     errors.email = "Enter a valid email address";
     return;
   }
-  
-  router.push("/reset-link");
+
+  try {
+    const accountCheckRes = await api.post("/auth/check-account", {
+      email: form.email,
+    });
+
+    if (!accountCheckRes?.data?.status) {
+      errors.email =
+        accountCheckRes?.data?.message || "No account found with this email.";
+      return;
+    }
+
+    const res = await api.post("/auth/forgot-password", {
+      email: form.email,
+    });
+
+    if (res?.data?.status === true) {
+      router.push("/reset-link");
+      return;
+    }
+
+    errors.email = res?.data?.message || "Unable to send reset link.";
+  } catch (error) {
+    errors.email =
+      error?.response?.data?.message || "Something went wrong. Please try again.";
+  }
   
 };
 </script>
