@@ -84,14 +84,15 @@
 </template>
 
 <script setup>
-import { reactive } from "vue"
-import { useRouter } from "vue-router"
+import { onMounted, reactive } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import GoogleSignin from "../../components/Auth/GoogleSignin.vue"
 import Logo from "../../components/common/Logo.vue"
 import WarningIcon from "../../assets/images/WarningIcon.svg"
-import api from "../../services/api"
+import api, { TOKEN_KEY } from "../../services/api"
 
 const router = useRouter()
+const route = useRoute()
 
 /* Form State */
 const form = reactive({
@@ -151,4 +152,21 @@ const handleSubmit = async () => {
 
   
 }
+
+onMounted(() => {
+  const tokenQuery = route.query.token
+  const tokenValue = Array.isArray(tokenQuery) ? tokenQuery[0] : tokenQuery
+
+  if (!tokenValue || typeof tokenValue !== "string") {
+    return
+  }
+
+  const normalizedToken = tokenValue.replace(/^"+|"+$/g, "")
+  if (!normalizedToken) {
+    return
+  }
+
+  localStorage.setItem(TOKEN_KEY, normalizedToken)
+  router.replace("/chat")
+})
 </script>

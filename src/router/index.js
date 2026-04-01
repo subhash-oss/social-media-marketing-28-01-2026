@@ -11,6 +11,19 @@ import PasswordUpdation from "../views/PasswordUpdation.vue";
 import Dashboard from '../views/Dashboard.vue';
 import AccountDeleted from '../views/AccountDeleted.vue';
 
+const TOKEN_KEY = "access_token";
+const PUBLIC_PATHS = [
+  "/signin",
+  "/signup",
+  "/email-validation",
+  "/password",
+  "/forgot-password",
+  "/reset-link",
+  "/reset-password",
+  "/password-updation",
+  "/deleted-message",
+];
+
 const routes = [
   { path: "/signup", name: "SignUp", component: SignUp, },
   { path: "/signin", name: "SignIn", component: SignIn, },
@@ -37,6 +50,47 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to) => {
+  const normalizedPath = to.path.replace(/\/+$/, "") || "/";
+  const authOnlyPaths = ["/signin", "/signup"];
+  const normalizedPublicPaths = PUBLIC_PATHS.map((path) => path.replace(/\/+$/, "") || "/");
+
+  if (normalizedPath === "/signin") {
+    const tokenQuery = to.query.token;
+    const tokenValue = Array.isArray(tokenQuery) ? tokenQuery[0] : tokenQuery;
+
+    if (typeof tokenValue === "string" && tokenValue.trim()) {
+      const normalizedToken = tokenValue.replace(/^"+|"+$/g, "").trim();
+
+      if (normalizedToken) {
+        localStorage.setItem(TOKEN_KEY, normalizedToken);
+        console.log("Google login token:", normalizedToken);
+        return "/chat";
+      }
+    }
+  }
+
+  const isSignedIn = Boolean(localStorage.getItem(TOKEN_KEY));
+
+  if (normalizedPath === "/" && isSignedIn) {
+    return "/chat";
+  }
+
+  if (normalizedPath === "/" && !isSignedIn) {
+    return "/signin";
+  }
+
+  if (isSignedIn && authOnlyPaths.includes(normalizedPath)) {
+    return "/chat";
+  }
+
+  if (!isSignedIn && !normalizedPublicPaths.includes(normalizedPath)) {
+    return "/signin";
+  }
+
+  return true;
 });
 
 router.afterEach((to) => {
