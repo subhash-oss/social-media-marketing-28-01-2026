@@ -6,6 +6,7 @@ const api = axios.create({
   baseURL: "https://griffon-precious-basilisk.ngrok-free.app/",
   headers: {
     "Content-Type": "application/json",
+    'ngrok-skip-browser-warning': 'true',
   },
   timeout: 10000,
 })
@@ -23,7 +24,16 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error)
+  (error) => {
+    if (error.response?.status === 401) {
+      console.error("Authentication failed - Token expired or invalid")
+      // Clear the invalid token
+      localStorage.removeItem(TOKEN_KEY)
+      // Redirect to login page
+      window.location.href = "/signin"
+    }
+    return Promise.reject(error)
+  }
 )
 
 export { TOKEN_KEY }

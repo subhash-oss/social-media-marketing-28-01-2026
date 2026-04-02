@@ -172,13 +172,13 @@
                   </button>
                   
                   <!-- Refresh/Redo Icon -->
-                  <button
+                  <!-- <button
                     @click="handleRefresh(index)"
                     class="flex items-center justify-center w-4xl h-4xl  text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                     title="Refresh"
                   >
                     <img :src="RestartIcon" alt="">
-                  </button>
+                  </button> -->
                 </div>
               </div>
             </div>
@@ -321,34 +321,34 @@ const handleDislike = (index) => {
 };
 
 // Handle refresh/regenerate response
-const handleRefresh = (index) => {
-  if (messages.value[index]) {
-    // Set loading state
-    messages.value[index].isLoading = true;
-    messages.value[index].aiResponse = null;
-    messages.value[index].responseType = null;
-    messages.value[index].suggestedResponses = [];
+// const handleRefresh = (index) => {
+//   if (messages.value[index]) {
+//     // Set loading state
+//     messages.value[index].isLoading = true;
+//     messages.value[index].aiResponse = null;
+//     messages.value[index].responseType = null;
+//     messages.value[index].suggestedResponses = [];
     
-    // Scroll to bottom
-    scrollToBottom();
+//     // Scroll to bottom
+//     scrollToBottom();
     
-    // Regenerate response after a delay (simulating API call)
-    setTimeout(() => {
-      if (messages.value[index]) {
-        messages.value[index].isLoading = false;
-        // Regenerate with same dummy message for now
-        messages.value[index].aiResponse = "Great! ✨ Let's set up your brand. You can share your <strong>website</strong>, upload <strong>brand documents</strong>, or simply describe your <strong>products</strong> and style here in the chat. I'll use this info to understand your brand's tone, personality, and style.";
+//     // Regenerate response after a delay (simulating API call)
+//     setTimeout(() => {
+//       if (messages.value[index]) {
+//         messages.value[index].isLoading = false;
+//         // Regenerate with same dummy message for now
+//         messages.value[index].aiResponse = "Great! ✨ Let's set up your brand. You can share your <strong>website</strong>, upload <strong>brand documents</strong>, or simply describe your <strong>products</strong> and style here in the chat. I'll use this info to understand your brand's tone, personality, and style.";
         
-        // Reset like/dislike states
-        messages.value[index].isLiked = false;
-        messages.value[index].isDisliked = false;
+//         // Reset like/dislike states
+//         messages.value[index].isLiked = false;
+//         messages.value[index].isDisliked = false;
         
-        // Scroll when AI response updates
-        scrollToBottom();
-      }
-    }, 5000);
-  }
-};
+//         // Scroll when AI response updates
+//         scrollToBottom();
+//       }
+//     }, 5000);
+//   }
+// };
 
 // const handleEdit = (index) => {
 //   editingIndex.value = index;
@@ -446,6 +446,8 @@ const handleNewMessage = async (messageData) => {
   
   messages.value.push(newMessage);
   
+
+  console.log("message data", messages)
   // Scroll to bottom when new message is added
   scrollToBottom();
   

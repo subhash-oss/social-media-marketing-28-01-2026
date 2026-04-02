@@ -115,6 +115,13 @@
               >
                 {{ model }}
               </div>
+              <!-- Loading State -->
+              <div
+                v-if="isLoadingModels"
+                class="px-xl py-xs label_2_medium secondary_text_color"
+              >
+                Loading...
+              </div>
             </div>
           </div>
         </div>
@@ -147,6 +154,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, watch } from "vue";
+import api from "../../services/api.js";
 
 import ProductIcon from "../../assets/images/ProductIcon.svg";
 import AttachmentIcon from "../../assets/images/AttachmentIcon.svg";
@@ -171,20 +179,22 @@ const prompt = ref("");
 const isInputFocused = ref(false);
 
 /* Products */
-const products = ["All products", "Instagram", "LinkedIn", "Twitter"];
+const products = ref([]);
 const selectedProduct = ref("All products");
 const showProducts = ref(false);
 const productsDropdownRef = ref(null);
 const productsDropdownMenuRef = ref(null);
 const productsDropdownPosition = ref("below");
+const isLoadingProducts = ref(false);
 
 /* Models */
-const models = ["Gemini 2.5 pro", "Gemini 2.0", "GPT-4"];
-const selectedModel = ref("Gemini 2.5 pro");
+const models = ref([]);
+const selectedModel = ref("");
 const showModels = ref(false);
 const modelsDropdownRef = ref(null);
 const modelsDropdownMenuRef = ref(null);
 const modelsDropdownPosition = ref("below");
+const isLoadingModels = ref(false);
 
 /* Files */
 const files = ref([]);
@@ -243,9 +253,56 @@ const selectProduct = (item) => {
   showProducts.value = false;
 };
 
+// Fetch products from API
+const fetchProducts = async () => {
+  isLoadingProducts.value = true;
+  try {
+    const response = await api.get('/api/products');
+    console.log('Products API Response:', response.data);
+    
+    // Extract product names from response
+    if (response.data && Array.isArray(response.data)) {
+      products.value = response.data.map(product => product.name || product);
+    } else if (response.data && response.data.products && Array.isArray(response.data.products)) {
+      products.value = response.data.products.map(product => product.name || product);
+    }
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    products.value = [];
+  } finally {
+    isLoadingProducts.value = false;
+  }
+};
+
 const selectModel = (model) => {
   selectedModel.value = model;
   showModels.value = false;
+};
+
+// Fetch models from API
+const fetchModels = async () => {
+  isLoadingModels.value = true;
+  try {
+    const response = await api.get('/api/ai/models');
+    console.log('Models API Response:', response.data);
+    
+    // Extract model names from response
+    if (response.data && Array.isArray(response.data)) {
+      models.value = response.data.map(model => model.name || model);
+    } else if (response.data && response.data.models && Array.isArray(response.data.models)) {
+      models.value = response.data.models.map(model => model.name || model);
+    }
+    
+    // Set default selected model if available
+    if (models.value.length > 0 && !selectedModel.value) {
+      selectedModel.value = models.value[0];
+    }
+  } catch (error) {
+    console.error('Error fetching models:', error);
+    models.value = [];
+  } finally {
+    isLoadingModels.value = false;
+  }
 };
 
 const handleFiles = (e) => {
@@ -336,6 +393,10 @@ onMounted(() => {
   document.addEventListener("click", handleClickOutside);
   window.addEventListener("resize", handleResize);
   window.addEventListener("scroll", handleResize, true);
+  
+  // Fetch products and models from API
+  fetchProducts();
+  fetchModels();
 });
 
 onUnmounted(() => {
