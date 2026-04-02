@@ -33,24 +33,24 @@
               </div>
               
               <!-- Edit Button with Tooltip -->
-              <div class="relative group/button">
+              <!-- <div class="relative group/button">
                 <button
                   @click="handleEdit(index)"
                   class="flex items-center gap-sm rounded-lg bg_secondary_color p-md "
                 >
                   <img :src="ImageEditIcon" alt="Edit"  />
-                </button>
+                </button> -->
                 <!-- Speech Bubble Tooltip -->
-                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-md invisible group-hover/button:visible transition-all duration-200 pointer-events-none whitespace-nowrap z-[1000]">
+                <!-- <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-md invisible group-hover/button:visible transition-all duration-200 pointer-events-none whitespace-nowrap z-[1000]">
                   <div class="relative bg-black-400 primary_2_text_color label_3_semibold rounded-lg px-md py-xl outline-none ring-0">
-                    Edit
+                    Edit -->
                     <!-- Speech Bubble Tail -->
-                    <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
+                    <!-- <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
                       <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-black-400"></div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
             
             <!-- Message Bubble -->
@@ -59,7 +59,7 @@
               :class="editingIndex === index ? 'w-full' : ''"
             >
               <!-- Edit Mode -->
-              <div v-if="editingIndex === index" class="flex flex-col gap-md">
+              <!-- <div v-if="editingIndex === index" class="flex flex-col gap-md">
                 <textarea
                   v-model="editingText"
                   @keydown.enter.exact.prevent="saveEdit(index)"
@@ -83,9 +83,9 @@
                     Sent
                   </button>
                 </div>
-              </div>
+              </div> -->
               <!-- Display Mode -->
-              <p v-else class="Body_2_regular primary_text_color">
+              <p class="Body_2_regular primary_text_color">
                 {{ message.text }}
               </p>
             </div>
@@ -350,67 +350,67 @@ const handleRefresh = (index) => {
   }
 };
 
-const handleEdit = (index) => {
-  editingIndex.value = index;
-  editingText.value = messages.value[index].text;
-  nextTick(() => {
-    if (editTextareaRef) {
-      editTextareaRef.focus();
-      // Move cursor to end
-      editTextareaRef.setSelectionRange(
-        editTextareaRef.value.length,
-        editTextareaRef.value.length
-      );
-    }
-  });
-};
+// const handleEdit = (index) => {
+//   editingIndex.value = index;
+//   editingText.value = messages.value[index].text;
+//   nextTick(() => {
+//     if (editTextareaRef) {
+//       editTextareaRef.focus();
+//       // Move cursor to end
+//       editTextareaRef.setSelectionRange(
+//         editTextareaRef.value.length,
+//         editTextareaRef.value.length
+//       );
+//     }
+//   });
+// };
 
-const saveEdit = (index) => {
-  if (editingText.value.trim()) {
-    const editedText = editingText.value.trim();
+// const saveEdit = (index) => {
+//   if (editingText.value.trim()) {
+//     const editedText = editingText.value.trim();
     
-    // Update the message text
-    messages.value[index].text = editedText;
+//     // Update the message text
+//     messages.value[index].text = editedText;
     
-    // Remove all messages after the edited message (like ChatGPT workflow)
-    messages.value = messages.value.slice(0, index + 1);
+//     // Remove all messages after the edited message (like ChatGPT workflow)
+//     messages.value = messages.value.slice(0, index + 1);
     
-    // Clear AI response and set loading state for the edited message
-    messages.value[index].aiResponse = null;
-    messages.value[index].isLoading = true;
-    messages.value[index].isLiked = false;
-    messages.value[index].isDisliked = false;
-    messages.value[index].responseType = null;
-    messages.value[index].suggestedResponses = [];
+//     // Clear AI response and set loading state for the edited message
+//     messages.value[index].aiResponse = null;
+//     messages.value[index].isLoading = true;
+//     messages.value[index].isLiked = false;
+//     messages.value[index].isDisliked = false;
+//     messages.value[index].responseType = null;
+//     messages.value[index].suggestedResponses = [];
     
-    // Exit edit mode
-    editingIndex.value = null;
-    editingText.value = "";
+//     // Exit edit mode
+//     editingIndex.value = null;
+//     editingText.value = "";
     
-    // Scroll to bottom after edit
-    scrollToBottom();
+//     // Scroll to bottom after edit
+//     scrollToBottom();
     
-    // Trigger new AI response after a delay (simulating API call)
-    setTimeout(() => {
-      if (messages.value[index]) {
-        messages.value[index].isLoading = false;
-        // Show first dummy message
-        messages.value[index].aiResponse = "Great! ✨ Let's set up your brand. You can share your <strong>website</strong>, upload <strong>brand documents</strong>, or simply describe your <strong>products</strong> and style here in the chat. I'll use this info to understand your brand's tone, personality, and style.";
+//     // Trigger new AI response after a delay (simulating API call)
+//     setTimeout(() => {
+//       if (messages.value[index]) {
+//         messages.value[index].isLoading = false;
+//         // Show first dummy message
+//         messages.value[index].aiResponse = "Great! ✨ Let's set up your brand. You can share your <strong>website</strong>, upload <strong>brand documents</strong>, or simply describe your <strong>products</strong> and style here in the chat. I'll use this info to understand your brand's tone, personality, and style.";
         
-        // Scroll when AI response updates
-        scrollToBottom();
+//         // Scroll when AI response updates
+//         scrollToBottom();
         
-        // Add second dummy message after a short delay
+//         // Add second dummy message after a short delay
 
-      }
-    }, 5000);
-  }
-};
+//       }
+//     }, 5000);
+//   }
+// };
 
-const cancelEdit = () => {
-  editingIndex.value = null;
-  editingText.value = "";
-};
+// const cancelEdit = () => {
+//   editingIndex.value = null;
+//   editingText.value = "";
+// };
 
 // Handle suggested response button click
 const handleSuggestedResponse = (suggestion, currentMessageIndex) => {
