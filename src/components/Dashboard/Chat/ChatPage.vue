@@ -107,6 +107,36 @@
               <!-- AI Response Content -->
               <div v-else-if="message.aiResponse">
                 <div class="Body_2_regular primary_text_color lg:px-3xl pb-md pt-3xl" v-html="message.aiResponse"></div>
+                
+                <!-- Suggested Responses (for conversation type) -->
+                <div 
+                  v-if="message.responseType === 'conversation' && message.suggestedResponses && message.suggestedResponses.length > 0"
+                  class="flex flex-wrap gap-2 px-3xl mt-3"
+                >
+                  <template
+                    v-for="(suggestion, sIndex) in message.suggestedResponses"
+                    :key="sIndex"
+                  >
+                    <!-- Render as link if URL exists -->
+                    <a
+                      v-if="suggestion.url"
+                      :href="suggestion.url"
+                      class="px-4 py-2 rounded-full border border-[#3B82F6] text-[#3B82F6] label_2_medium hover:bg-blue-50 transition-colors no-underline"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </a>
+                    <!-- Render as button otherwise -->
+                    <button
+                      v-else
+                      @click="handleSuggestedResponse(suggestion, index)"
+                      class="px-4 py-2 rounded-full border border-[#3B82F6] text-[#3B82F6] label_2_medium hover:bg-blue-50 transition-colors"
+                      :disabled="isAiGenerating"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </button>
+                  </template>
+                </div>
+                
                 <!-- Action Icons Row -->
                 <div class="flex items-center gap-sm px-3xl mt-4xl">
                   <!-- Copy Icon -->
@@ -186,6 +216,7 @@ import PromptBox from "../PromptBox.vue";
 import ImageEditIcon from "../../../assets/images/ImageEditIcon.svg";
 import TextCopyIcon from "../../../assets/images/TextCopyIcon.svg";
 import RestartIcon from "../../../assets/images/RestartIcon.svg";
+import api from "../../../services/api.js";
 
 const props = defineProps({
   initialMessages: {
@@ -195,8 +226,14 @@ const props = defineProps({
   isSidebarCollapsed: {
     type: Boolean,
     default: false
+  },
+  sessionId: {
+    type: String,
+    default: null
   }
 });
+
+const emit = defineEmits(['update:sessionId']);
 
 
 const messages = ref([...props.initialMessages]);
@@ -289,6 +326,8 @@ const handleRefresh = (index) => {
     // Set loading state
     messages.value[index].isLoading = true;
     messages.value[index].aiResponse = null;
+    messages.value[index].responseType = null;
+    messages.value[index].suggestedResponses = [];
     
     // Scroll to bottom
     scrollToBottom();
@@ -341,6 +380,8 @@ const saveEdit = (index) => {
     messages.value[index].isLoading = true;
     messages.value[index].isLiked = false;
     messages.value[index].isDisliked = false;
+    messages.value[index].responseType = null;
+    messages.value[index].suggestedResponses = [];
     
     // Exit edit mode
     editingIndex.value = null;
@@ -371,7 +412,26 @@ const cancelEdit = () => {
   editingText.value = "";
 };
 
-const handleNewMessage = (messageData) => {
+// Handle suggested response button click
+const handleSuggestedResponse = (suggestion, currentMessageIndex) => {
+  // Prevent clicking if AI is already generating
+  if (isAiGenerating.value) return;
+  
+  // Extract text from suggestion object or use as-is if string
+  const suggestionText = typeof suggestion === 'object' && suggestion !== null 
+    ? suggestion.text 
+    : suggestion;
+  
+  // Send the suggestion as a new message
+  handleNewMessage({
+    text: suggestionText,
+    product: messages.value[currentMessageIndex]?.product || 'All products',
+    model: messages.value[currentMessageIndex]?.model || 'Gemini 2.5 pro',
+    files: []
+  });
+};
+
+const handleNewMessage = async (messageData) => {
   // Add user message
   const newMessage = {
     text: messageData.text,
@@ -389,20 +449,78 @@ const handleNewMessage = (messageData) => {
   // Scroll to bottom when new message is added
   scrollToBottom();
   
-  // Show loading for 3 seconds, then show dummy messages
-  setTimeout(() => {
+  try {
+    // Build FormData for API request
+    const formData = new FormData();
+    formData.append('message', messageData.text);
+    formData.append('isHidden', 'false');
+    
+    // Add sessionId if available (for continuing conversation)
+    if (props.sessionId) {
+      formData.append('sessionId', props.sessionId);
+    }
+    
+    // Add optional fields if provided
+    if (messageData.product && messageData.product !== 'All products') {
+      formData.append('productId', messageData.product);
+    }
+    if (messageData.model) {
+      formData.append('model', messageData.model);
+    }
+    
+    // Add files if any
+    if (messageData.files && messageData.files.length > 0) {
+      messageData.files.forEach(file => {
+        formData.append('files', file);
+      });
+    }
+    
+    // Make API call with 60-second timeout
+    const response = await api.post('/api/ai/chat', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      timeout: 60000
+    });
+    
+    // Console log the API response
+    console.log('API Response:', response.data);
+    
     const messageIndex = messages.value.length - 1;
+    
+    // Extract sessionId from response and update parent if needed
+    if (response.data && response.data.sessionId) {
+      // Only emit if sessionId is different (shouldn't happen in normal flow)
+      if (response.data.sessionId !== props.sessionId) {
+        emit('update:sessionId', response.data.sessionId);
+      }
+    }
+    
+    // Update the message with AI response
     if (messages.value[messageIndex]) {
       messages.value[messageIndex].isLoading = false;
-      // Show first dummy message
-      messages.value[messageIndex].aiResponse = "Great! ✨ Let's set up your brand. You can share your <strong>website</strong>, upload <strong>brand documents</strong>, or simply describe your <strong>products</strong> and style here in the chat. I'll use this info to understand your brand's tone, personality, and style.";
-      
-      // Scroll when AI response updates
-      scrollToBottom();
-      
-      // Add second dummy message after a short delay
+      messages.value[messageIndex].aiResponse = response.data?.message || response.data?.response || "No response received";
+      messages.value[messageIndex].responseType = response.data?.type || null;
+      messages.value[messageIndex].suggestedResponses = response.data?.suggestedResponses || [];
     }
-  }, 5000);
+    
+    // Scroll when AI response updates
+    scrollToBottom();
+    
+  } catch (error) {
+    console.error("Error sending message:", error);
+    
+    const messageIndex = messages.value.length - 1;
+    
+    // Show error message
+    if (messages.value[messageIndex]) {
+      messages.value[messageIndex].isLoading = false;
+      messages.value[messageIndex].aiResponse = "Sorry, I encountered an error. Please try again.";
+    }
+    
+    // Scroll to show error
+    scrollToBottom();
+  }
 };
 
 // Watch for changes in messages array to auto-scroll

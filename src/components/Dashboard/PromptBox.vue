@@ -14,10 +14,14 @@
         type="text"
         placeholder="What's on your mind?"
         class="w-full border-none outline-none label_1_regular"
-        :class="prompt ? 'primary_text_color' : 'secondary_text_color'"
+        :class="[
+          prompt ? 'primary_text_color' : 'secondary_text_color',
+          props.isAiGenerating ? 'opacity-50 cursor-not-allowed' : ''
+        ]"
         @keyup.enter="handleSend"
         @focus="isInputFocused = true"
         @blur="isInputFocused = false"
+        :disabled="props.isAiGenerating"
       />
 
       <!-- Toolbar -->
@@ -116,7 +120,12 @@
         </div>
 
         <!-- Mic / Send -->
-        <button class="rounded-full" @click="handleSend">
+        <button 
+          class="rounded-full" 
+          @click="handleSend"
+          :disabled="props.isAiGenerating"
+          :class="props.isAiGenerating ? 'opacity-50 cursor-not-allowed' : ''"
+        >
           <img v-if="!prompt.trim()" :src="MikeIcon" alt="Microphone" />
           <img v-else :src="SendIcon" alt="">
         </button>
@@ -244,16 +253,19 @@ const handleFiles = (e) => {
 };
 
 const handleSend = () => {
-  if (prompt.value.trim()) {
-    emit('send-message', {
-      text: prompt.value.trim(),
-      product: selectedProduct.value,
-      model: selectedModel.value,
-      files: files.value
-    });
-    prompt.value = "";
-    files.value = [];
+  // Prevent sending if AI is generating or input is empty
+  if (props.isAiGenerating || !prompt.value.trim()) {
+    return;
   }
+  
+  emit('send-message', {
+    text: prompt.value.trim(),
+    product: selectedProduct.value,
+    model: selectedModel.value,
+    files: files.value
+  });
+  prompt.value = "";
+  files.value = [];
 };
 
 /* Click outside handler */

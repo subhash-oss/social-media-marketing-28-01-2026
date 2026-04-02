@@ -70,7 +70,7 @@
         class="primary_button w-full mt-6xl"
         @click="handleSubmit"
       >
-        Go to Sign In
+        Update Password
       </button>
 
       <!-- Links -->
@@ -89,13 +89,15 @@
 
 <script setup>
 import { ref, reactive, watch, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import EyeOpenIcon from "../../assets/images/EyeOpen.svg";
 import LockIcon from "../../assets/images/LockIcon.svg";
 import EyeCloseIcon from "../../assets/images/EyeCloseIcon.svg";
 import WarningIcon from "../../assets/images/WarningIcon.svg";
 import Logo from "../../components/common/Logo.vue"
+import api from "../../services/api";
 
+const route = useRoute();
 const router = useRouter();
 
 /* State */
@@ -242,7 +244,7 @@ const inputClass = (error) =>
     : "regular_border_color";
 
 /* Submit & Validation */
-const handleSubmit = () => {
+const handleSubmit = async () => {
   errorMessage.value = "";
 
   if (!password.value) {
@@ -255,9 +257,29 @@ const handleSubmit = () => {
      "Oops! The password you entered is incorrect.";
     return;
   }
-  router.push('/password-updation');
-  // ✅ If validation passes
-  console.log("Password valid, proceed with login");
+
+  const resetToken = route.query.token;
+  if (!resetToken || typeof resetToken !== "string") {
+    errorMessage.value = "Reset token is missing or invalid.";
+    return;
+  }
+
+  try {
+    const response = await api.post("/auth/reset-password", {
+      token: resetToken,
+      new_password: password.value,
+    });
+
+    if (response?.data?.status) {
+      router.push("/password-updation");
+      return;
+    }
+
+    errorMessage.value = response?.data?.message || "Unable to update password.";
+  } catch (error) {
+    errorMessage.value =
+      error?.response?.data?.message || "Something went wrong. Please try again.";
+  }
 };
 </script>
 
