@@ -242,6 +242,20 @@
   const chatSessions = ref([]);
   const isLoadingSessions = ref(false);
 
+  /** Milliseconds for sorting; prefers updated time so active threads rise to the top. */
+  const getSessionActivityMs = (s) => {
+    const raw =
+      s.updatedAt ??
+      s.updated_at ??
+      s.lastActive ??
+      s.last_active_at ??
+      s.createdAt ??
+      s.created_at ??
+      0;
+    const t = new Date(raw).getTime();
+    return Number.isFinite(t) ? t : 0;
+  };
+
   const handleSignOut = () => {
     // Handle sign out logic here
     console.log("Sign out clicked");
@@ -317,7 +331,6 @@
     isLoadingSessions.value = true;
     try {
       const response = await api.get('/api/ai/sessions');
-      console.log('Chat Sessions API Response:', response.data);
       
       let sessions = [];
       
@@ -328,12 +341,9 @@
         sessions = response.data.sessions;
       }
       
-      // Sort sessions by most recently active (updatedAt or createdAt timestamp)
-      chatSessions.value = sessions.sort((a, b) => {
-        const dateA = new Date(a.updatedAt || a.createdAt || a.lastActive || 0);
-        const dateB = new Date(b.updatedAt || b.createdAt || b.lastActive || 0);
-        return dateB - dateA; // Descending order (most recent first)
-      });
+      chatSessions.value = [...sessions].sort(
+        (a, b) => getSessionActivityMs(b) - getSessionActivityMs(a)
+      );
     } catch (error) {
       console.error('Error fetching chat sessions:', error);
       chatSessions.value = [];

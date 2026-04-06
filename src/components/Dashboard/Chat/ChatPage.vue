@@ -104,7 +104,110 @@
               <div v-if="message.isLoading" class="rounded-2xl lg:px-3xl py-xs">
                <p class="primary_text_color body_3_regular"> Got it, give me a moment<span class="loading-dots"></span></p>
               </div>
-              <!-- AI Response Content -->
+              <!-- AI Response: post generated (image + caption + pills) -->
+              <div v-else-if="message.aiResponse && message.responseType === 'post_generated'" class="lg:px-3xl pt-3xl pb-md">
+                <p class="Body_2_regular primary_text_color pb-4">
+                  {{ message.aiResponse }}
+                </p>
+
+                <!-- Generated image gallery -->
+                <div
+                  v-if="postGeneratedImageUrls(message).length > 0"
+                  class="flex gap-3 overflow-x-auto pb-4 -mx-1 px-1 custom_scrollbar"
+                >
+                  <img
+                    v-for="(imgUrl, imgIdx) in postGeneratedImageUrls(message)"
+                    :key="imgIdx"
+                    :src="imgUrl"
+                    alt="Generated post"
+                    class="h-52 w-52 shrink-0 rounded-2xl object-cover border primary_border_color bg_secondary_color"
+                  />
+                </div>
+
+                <!-- Post caption: when API sends marketing copy distinct from the intro message -->
+                <p
+                  v-if="showPostMarketingCaption(message)"
+                  class="Body_2_regular primary_text_color pb-4 whitespace-pre-wrap"
+                >
+                  {{ message.typeData.marketingCopy }}
+                </p>
+
+                <!-- Suggested responses: light blue pills -->
+                <div
+                  v-if="message.suggestedResponses && message.suggestedResponses.length > 0"
+                  class="flex flex-wrap gap-2"
+                >
+                  <template
+                    v-for="(suggestion, sIndex) in message.suggestedResponses"
+                    :key="sIndex"
+                  >
+                    <router-link
+                      v-if="suggestion.url && isInternalPath(suggestion.url)"
+                      :to="suggestion.url"
+                      class="inline-flex items-center px-4 py-2 rounded-full bg-[#EFF6FF] text-[#2563EB] label_2_medium hover:bg-[#DBEAFE] transition-colors no-underline"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </router-link>
+                    <a
+                      v-else-if="suggestion.url"
+                      :href="suggestion.url"
+                      class="inline-flex items-center px-4 py-2 rounded-full bg-[#EFF6FF] text-[#2563EB] label_2_medium hover:bg-[#DBEAFE] transition-colors no-underline"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </a>
+                    <button
+                      v-else
+                      type="button"
+                      @click="handleSuggestedResponse(suggestion, index)"
+                      class="inline-flex items-center px-4 py-2 rounded-full bg-[#EFF6FF] text-[#2563EB] label_2_medium hover:bg-[#DBEAFE] transition-colors"
+                      :disabled="isAiGenerating"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </button>
+                  </template>
+                </div>
+
+                <!-- Action icons -->
+                <div class="flex items-center gap-sm mt-4xl">
+                  <button
+                    type="button"
+                    @click="handleCopyPostGenerated(message)"
+                    class="flex items-center justify-center w-4xl h-4xl cursor-pointer"
+                    title="Copy"
+                  >
+                    <img :src="TextCopyIcon" alt="Copy" />
+                  </button>
+                  <button
+                    type="button"
+                    @click="handleLike(index)"
+                    class="flex items-center justify-center w-4xl h-4xl cursor-pointer"
+                    title="Like"
+                  >
+                    <svg class="w-4xl h-4xl" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 8.25V14.25C5.25 14.4489 5.17098 14.6397 5.03033 14.7803C4.88968 14.921 4.69891 15 4.5 15H3C2.80109 15 2.61032 14.921 2.46967 14.7803C2.32902 14.6397 2.25 14.4489 2.25 14.25V9C2.25 8.80109 2.32902 8.61032 2.46967 8.46967C2.61032 8.32902 2.80109 8.25 3 8.25H5.25ZM5.25 8.25C6.04565 8.25 6.80871 7.93393 7.37132 7.37132C7.93393 6.80871 8.25 6.04565 8.25 5.25V4.5C8.25 4.10218 8.40804 3.72064 8.68934 3.43934C8.97064 3.15804 9.35218 3 9.75 3C10.1478 3 10.5294 3.15804 10.8107 3.43934C11.092 3.72064 11.25 4.10218 11.25 4.5V8.25H13.5C13.8978 8.25 14.2794 8.40804 14.5607 8.68934C14.842 8.97064 15 9.35218 15 9.75L14.25 13.5C14.1421 13.9601 13.9375 14.3552 13.667 14.6257C13.3964 14.8963 13.0746 15.0276 12.75 15H7.5C6.90326 15 6.33097 14.7629 5.90901 14.341C5.48705 13.919 5.25 13.3467 5.25 12.75" :stroke="message.isLiked ? '#7950F2' : '#596773'" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    @click="handleDislike(index)"
+                    class="flex items-center justify-center w-4xl h-4xl cursor-pointer"
+                    title="Dislike"
+                  >
+                    <svg class="w-4xl h-4xl" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 9.74971V3.74971C5.25 3.55079 5.17098 3.36003 5.03033 3.21938C4.88968 3.07872 4.69891 2.99971 4.5 2.99971H3C2.80109 2.99971 2.61032 3.07872 2.46967 3.21938C2.32902 3.36003 2.25 3.55079 2.25 3.74971V8.99971C2.25 9.19862 2.32902 9.38938 2.46967 9.53004C2.61032 9.67069 2.80109 9.74971 3 9.74971H5.25ZM5.25 9.74971C6.04565 9.74971 6.80871 10.0658 7.37132 10.6284C7.93393 11.191 8.25 11.9541 8.25 12.7497V13.4997C8.25 13.8975 8.40804 14.2791 8.68934 14.5604C8.97064 14.8417 9.35218 14.9997 9.75 14.9997C10.1478 14.9997 10.5294 14.8417 10.8107 14.5604C11.092 14.2791 11.25 13.8975 11.25 13.4997V9.74971H13.5C13.8978 9.74971 14.2794 9.59167 14.5607 9.31036C14.842 9.02906 15 8.64753 15 8.24971L14.25 4.49971C14.1421 4.0396 13.9375 3.64452 13.667 3.37398C13.3964 3.10344 13.0746 2.97209 12.75 2.99971H7.5C6.90326 2.99971 6.33097 3.23676 5.90901 3.65872C5.48705 4.08067 5.25 4.65297 5.25 5.24971" :stroke="message.isDisliked ? '#DC2626' : '#596773'" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="flex items-center justify-center w-4xl h-4xl cursor-pointer opacity-70 hover:opacity-100"
+                    title="Regenerate"
+                  >
+                    <img :src="RestartIcon" alt="" class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <!-- AI Response Content (default / conversation) -->
               <div v-else-if="message.aiResponse">
                 <div class="Body_2_regular primary_text_color lg:px-3xl pb-md pt-3xl" v-html="message.aiResponse"></div>
                 
@@ -277,6 +380,41 @@ const handleCopy = async (text) => {
   }
 };
 
+const plainTextFromAi = (value) => {
+  if (!value) return "";
+  const temp = document.createElement("div");
+  temp.innerHTML = String(value);
+  return (temp.textContent || temp.innerText || "").trim();
+};
+
+const postGeneratedImageUrls = (message) => {
+  const raw = message?.typeData?.generatedImage;
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.filter(Boolean);
+  return [raw];
+};
+
+/** True when there is a separate post caption (not the same string as the main assistant message). */
+const showPostMarketingCaption = (message) => {
+  const cap = message?.typeData?.marketingCopy?.trim();
+  if (!cap) return false;
+  return cap !== plainTextFromAi(message?.aiResponse);
+};
+
+const isInternalPath = (url) => typeof url === "string" && url.startsWith("/") && !url.startsWith("//");
+
+const handleCopyPostGenerated = async (message) => {
+  const main = plainTextFromAi(message?.aiResponse);
+  const cap = message?.typeData?.marketingCopy?.trim() || "";
+  const parts = [];
+  if (main) parts.push(main);
+  if (cap && cap !== main) parts.push(cap);
+  else if (!main && cap) parts.push(cap);
+  const urls = postGeneratedImageUrls(message);
+  if (urls.length) parts.push(urls.join("\n"));
+  await handleCopy(parts.join("\n\n"));
+};
+
 // Copy AI response (strip HTML tags)
 const handleCopyAIResponse = async (htmlContent, index) => {
   // Create a temporary div to extract text content
@@ -445,11 +583,14 @@ const handleNewMessage = async (messageData) => {
     isLoading: true,
     aiResponse: null, // Will be updated when AI responds
     isLiked: false,
-    isDisliked: false
+    isDisliked: false,
+    typeData: null
   };
   
   messages.value.push(newMessage);
   
+
+  console.log("message data", messages)
   // Scroll to bottom when new message is added
   scrollToBottom();
   
@@ -487,7 +628,7 @@ const handleNewMessage = async (messageData) => {
       timeout: 60000
     });
     
-
+    // Console log the API response
     console.log('API Response:', response.data);
     
     const messageIndex = messages.value.length - 1;
@@ -506,6 +647,7 @@ const handleNewMessage = async (messageData) => {
       messages.value[messageIndex].aiResponse = response.data?.message || response.data?.response || "No response received";
       messages.value[messageIndex].responseType = response.data?.type || null;
       messages.value[messageIndex].suggestedResponses = response.data?.suggestedResponses || [];
+      messages.value[messageIndex].typeData = response.data?.typeData ?? null;
     }
     
     // Scroll when AI response updates
@@ -549,35 +691,52 @@ const fetchChatHistory = async (sessionId) => {
   if (!sessionId) return;
   
   try {
+    console.log('Fetching chat history for session:', sessionId);
     
     const response = await api.get('/api/ai/history', {
       params: { sessionId }
     });
     
+    console.log('Chat History API Response:', response.data);
+    console.log('Response type:', typeof response.data);
+    console.log('Is Array:', Array.isArray(response.data));
+    console.log('Response.data keys:', Object.keys(response.data));
+    console.log('Response.data.success:', response.data.success);
+    console.log('Response.data.history:', response.data.history);
+    console.log('Is history array:', Array.isArray(response.data.history));
     
     let historyMessages = [];
     
     // Handle different response structures
     if (response.data?.messages && Array.isArray(response.data.messages)) {
+      console.log('Found messages array in response.data.messages');
       historyMessages = response.data.messages;
     } else if (Array.isArray(response.data)) {
+      console.log('Found direct array in response.data');
       historyMessages = response.data;
     } else if (response.data?.data && Array.isArray(response.data.data)) {
+      console.log('Found messages in response.data.data');
       historyMessages = response.data.data;
     } else if (response.data?.history && Array.isArray(response.data.history)) {
+      console.log('Found messages in response.data.history');
       historyMessages = response.data.history;
     } else if (response.data?.chats && Array.isArray(response.data.chats)) {
+      console.log('Found messages in response.data.chats');
       historyMessages = response.data.chats;
     } else {
+      console.log('No recognized message array found in response');
       // Try to find any array in the response
       for (const key in response.data) {
+        console.log(`Checking key: ${key}, value:`, response.data[key], 'isArray:', Array.isArray(response.data[key]));
         if (Array.isArray(response.data[key])) {
+          console.log(`Found array in response.data.${key}`);
           historyMessages = response.data[key];
           break;
         }
       }
     }
     
+    console.log('History messages count:', historyMessages.length);
     
     // Clear existing messages first
     messages.value = [];
@@ -588,6 +747,7 @@ const fetchChatHistory = async (sessionId) => {
       let currentUserMessage = null;
       
       historyMessages.forEach((msg, index) => {
+        console.log(`Processing message ${index}:`, msg);
         
         if (msg.role === 'user') {
           // Save previous user message if exists
@@ -603,6 +763,7 @@ const fetchChatHistory = async (sessionId) => {
             isDisliked: msg.isDisliked || false,
             responseType: msg.responseType || msg.type || null,
             suggestedResponses: msg.suggestedResponses || [],
+            typeData: msg.typeData || null,
             product: msg.product || 'All products',
             model: msg.model || ''
           };
@@ -610,6 +771,11 @@ const fetchChatHistory = async (sessionId) => {
           // Attach AI response to current user message
           if (currentUserMessage) {
             currentUserMessage.aiResponse = msg.content || null;
+            currentUserMessage.typeData = msg.typeData ?? currentUserMessage.typeData ?? null;
+            currentUserMessage.responseType = msg.responseType || msg.type || currentUserMessage.responseType;
+            currentUserMessage.suggestedResponses = msg.suggestedResponses?.length
+              ? msg.suggestedResponses
+              : (currentUserMessage.suggestedResponses || []);
             groupedMessages.push(currentUserMessage);
             currentUserMessage = null;
           } else {
@@ -622,6 +788,7 @@ const fetchChatHistory = async (sessionId) => {
               isDisliked: msg.isDisliked || false,
               responseType: msg.responseType || msg.type || null,
               suggestedResponses: msg.suggestedResponses || [],
+              typeData: msg.typeData || null,
               product: msg.product || 'All products',
               model: msg.model || ''
             });
@@ -636,6 +803,7 @@ const fetchChatHistory = async (sessionId) => {
       
       messages.value = groupedMessages;
       
+      console.log('Mapped messages:', messages.value);
       
       // Update sessionId
       emit('update:sessionId', sessionId);
