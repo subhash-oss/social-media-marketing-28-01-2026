@@ -2,20 +2,24 @@
   <div class="flex min-h-screen bg_secondary_color overflow-hidden">
     <!-- Desktop Sidebar -->
     <Sidebar
+      ref="sidebarRef"
       class="hidden lg:flex"
       :activeTab="activeTab"
       @changeTab="handleTabChange"
       @collapseChange="isSidebarCollapsed = $event"
       @newChat="handleNewChat"
+      @loadSession="handleLoadSession"
     />
 
     <!-- Mobile Sidebar -->
     <SidebarMobile
+      ref="sidebarMobileRef"
       :is-open="showMobileSidebar"
       :activeTab="activeTab"
       @close="showMobileSidebar = false"
       @changeTab="handleTabChange"
       @newChat="handleNewChat"
+      @loadSession="handleLoadSession"
     />
 
     <!-- Main Area -->
@@ -34,7 +38,7 @@
 
       <!-- Content -->
       
-        <ChatView v-if="activeTab === 'chat'" :resetChat="resetChatFlag" :isSidebarCollapsed="isSidebarCollapsed" @reset-complete="resetChatFlag = false" />
+        <ChatView v-if="activeTab === 'chat'" :resetChat="resetChatFlag" :isSidebarCollapsed="isSidebarCollapsed" :sessionToLoad="sessionToLoad" @reset-complete="resetChatFlag = false" @sessionLoaded="sessionToLoad = null" @newSessionCreated="handleNewSessionCreated" />
         <CalendarView v-else-if="activeTab === 'calendar'" />
         <AnalyticsView v-else-if="activeTab === 'analytics'" />
         <ProductsView v-else-if="activeTab === 'products'" />
@@ -66,6 +70,9 @@ const activeTab = ref("chat");
 const showMobileSidebar = ref(false);
 const isSidebarCollapsed = ref(false);
 const resetChatFlag = ref(false);
+const sessionToLoad = ref(null);
+const sidebarRef = ref(null);
+const sidebarMobileRef = ref(null);
 
 // Map route paths to tab names
 const routeToTabMap = {
@@ -133,6 +140,26 @@ const handleTabChange = (tab) => {
 
 const handleNewChat = () => {
   resetChatFlag.value = true;
+  sessionToLoad.value = null;
+};
+
+const handleLoadSession = (sessionId) => {
+  sessionToLoad.value = sessionId;
+  // Ensure we're on the chat tab
+  if (activeTab.value !== 'chat') {
+    activeTab.value = 'chat';
+    router.push('/chat');
+  }
+};
+
+const handleNewSessionCreated = () => {
+  // Refresh the sidebar chat list when a new session is created
+  if (sidebarRef.value) {
+    sidebarRef.value.refreshChatSessions();
+  }
+  if (sidebarMobileRef.value) {
+    sidebarMobileRef.value.refreshChatSessions();
+  }
 };
 
 const handleNotificationsClose = () => {

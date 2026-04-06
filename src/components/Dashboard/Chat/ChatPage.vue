@@ -230,10 +230,14 @@ const props = defineProps({
   sessionId: {
     type: String,
     default: null
+  },
+  externalSessionId: {
+    type: String,
+    default: null
   }
 });
 
-const emit = defineEmits(['update:sessionId']);
+const emit = defineEmits(['update:sessionId', 'sessionLoaded']);
 
 
 const messages = ref([...props.initialMessages]);
@@ -446,8 +450,6 @@ const handleNewMessage = async (messageData) => {
   
   messages.value.push(newMessage);
   
-
-  console.log("message data", messages)
   // Scroll to bottom when new message is added
   scrollToBottom();
   
@@ -485,7 +487,7 @@ const handleNewMessage = async (messageData) => {
       timeout: 60000
     });
     
-    // Console log the API response
+
     console.log('API Response:', response.data);
     
     const messageIndex = messages.value.length - 1;
@@ -542,10 +544,131 @@ watch(
   { deep: true }
 );
 
+// Fetch chat history for a session
+const fetchChatHistory = async (sessionId) => {
+  if (!sessionId) return;
+  
+  try {
+    
+    const response = await api.get('/api/ai/history', {
+      params: { sessionId }
+    });
+    
+    
+    let historyMessages = [];
+    
+    // Handle different response structures
+    if (response.data?.messages && Array.isArray(response.data.messages)) {
+      historyMessages = response.data.messages;
+    } else if (Array.isArray(response.data)) {
+      historyMessages = response.data;
+    } else if (response.data?.data && Array.isArray(response.data.data)) {
+      historyMessages = response.data.data;
+    } else if (response.data?.history && Array.isArray(response.data.history)) {
+      historyMessages = response.data.history;
+    } else if (response.data?.chats && Array.isArray(response.data.chats)) {
+      historyMessages = response.data.chats;
+    } else {
+      // Try to find any array in the response
+      for (const key in response.data) {
+        if (Array.isArray(response.data[key])) {
+          historyMessages = response.data[key];
+          break;
+        }
+      }
+    }
+    
+    
+    // Clear existing messages first
+    messages.value = [];
+    
+    if (historyMessages.length > 0) {
+      // Group messages by user/AI pairs
+      const groupedMessages = [];
+      let currentUserMessage = null;
+      
+      historyMessages.forEach((msg, index) => {
+        
+        if (msg.role === 'user') {
+          // Save previous user message if exists
+          if (currentUserMessage) {
+            groupedMessages.push(currentUserMessage);
+          }
+          // Start new user message
+          currentUserMessage = {
+            text: msg.content || '',
+            aiResponse: null,
+            isLoading: false,
+            isLiked: msg.isLiked || false,
+            isDisliked: msg.isDisliked || false,
+            responseType: msg.responseType || msg.type || null,
+            suggestedResponses: msg.suggestedResponses || [],
+            product: msg.product || 'All products',
+            model: msg.model || ''
+          };
+        } else if (msg.role === 'ai' || msg.role === 'assistant') {
+          // Attach AI response to current user message
+          if (currentUserMessage) {
+            currentUserMessage.aiResponse = msg.content || null;
+            groupedMessages.push(currentUserMessage);
+            currentUserMessage = null;
+          } else {
+            // AI message without preceding user message (edge case)
+            groupedMessages.push({
+              text: '',
+              aiResponse: msg.content || null,
+              isLoading: false,
+              isLiked: msg.isLiked || false,
+              isDisliked: msg.isDisliked || false,
+              responseType: msg.responseType || msg.type || null,
+              suggestedResponses: msg.suggestedResponses || [],
+              product: msg.product || 'All products',
+              model: msg.model || ''
+            });
+          }
+        }
+      });
+      
+      // Add any remaining user message
+      if (currentUserMessage) {
+        groupedMessages.push(currentUserMessage);
+      }
+      
+      messages.value = groupedMessages;
+      
+      
+      // Update sessionId
+      emit('update:sessionId', sessionId);
+      emit('sessionLoaded', sessionId);
+      
+      // Scroll to bottom after loading history
+      nextTick(() => {
+        scrollToBottom();
+      });
+    } else {
+      console.log('No messages to display');
+    }
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+  }
+};
+
+// Watch for external session ID changes (when clicked from sidebar)
+watch(() => props.externalSessionId, (newSessionId) => {
+  if (newSessionId) {
+    fetchChatHistory(newSessionId);
+  }
+});
+
 // Scroll to bottom on initial mount if there are messages
 onMounted(() => {
   if (messages.value.length > 0) {
     scrollToBottom();
+  }
+  
+  // If externalSessionId is provided on mount, fetch history
+  if (props.externalSessionId) {
+    fetchChatHistory(props.externalSessionId);
   }
 });
 

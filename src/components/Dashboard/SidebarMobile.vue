@@ -35,15 +35,25 @@
 
     <!-- Chat History -->
     <p class="mt-6xl label_3_semibold primary_text_color">Chat history</p>
-    <div class="mt-xl">
-      <div class="cursor-pointer mt-lg p-md md:mt-xl md:p-xl label_2_regular primary_text_color flex justify-between hover:bg-info-50-hover border border-transparent hover:border-gray-50 rounded-lg">
-        <span>Create new product</span> <span class="text-black-50 text-2xl mt-[-0.45em]">...</span>
+    <div class="mt-xl max-h-[200px] overflow-y-auto custom_scrollbar pr-1">
+      <!-- Dynamic Chat Sessions from API -->
+      <div 
+        v-for="session in chatSessions" 
+        :key="session.id"
+        :data-session-id="session.id"
+        @click="handleSessionClick(session.id)"
+        class="cursor-pointer mt-lg p-md md:mt-xl md:p-xl label_2_regular primary_text_color flex justify-between hover:bg-info-50-hover border border-transparent hover:border-gray-50 rounded-lg"
+      >
+        <span class="truncate">{{ session.title || 'Untitled Chat' }}</span>
+        <span class="text-black-50 text-2xl mt-[-0.45em]">...</span>
       </div>
-      <div class=" cursor-pointer mt-xl p-xl label_2_regular primary_text_color flex justify-between hover:bg-info-50-hover border border-transparent hover:border-gray-50 rounded-lg">
-        <span>Generate marketing plan</span> <span class="text-black-50 text-2xl mt-[-0.45em]">...</span>
+      <!-- Loading State -->
+      <div v-if="isLoadingSessions" class="mt-xl p-xl label_2_regular secondary_text_color">
+        Loading...
       </div>
-      <div class=" cursor-pointer mt-xl p-xl label_2_regular primary_text_color flex justify-between hover:bg-info-50-hover border border-transparent hover:border-gray-50 rounded-lg">
-       <span>Create Instagram post</span> <span class="text-black-50 text-2xl mt-[-0.45em]">...</span>
+      <!-- Empty State -->
+      <div v-else-if="chatSessions.length === 0" class="mt-xl p-xl label_2_regular secondary_text_color">
+        No chat history
       </div>
     </div>
 
@@ -117,8 +127,9 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import api from "../../services/api.js";
 import PlusIcon from "../../assets/images/PlusIcon.svg";
 import CalenderIcon from "../../assets/images/CalendarIcon.svg";
 import SettingsIcon from "../../assets/images/SettingsIcon.svg";
@@ -134,12 +145,72 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(["changeTab", "close", "newChat"]);
+const emit = defineEmits(["changeTab", "close", "newChat", "loadSession"]);
 const router = useRouter();
 
 const select = (tab) => emit("changeTab", tab);
 
 const showUserAccount = ref(false);
+
+/* Chat Sessions */
+const chatSessions = ref([]);
+const isLoadingSessions = ref(false);
+
+// Fetch chat sessions from API
+const fetchChatSessions = async () => {
+  isLoadingSessions.value = true;
+  try {
+    const response = await api.get('/api/ai/sessions');
+    console.log('Mobile Chat Sessions API Response:', response.data);
+    
+    let sessions = [];
+    
+    // Extract sessions from response
+    if (response.data && Array.isArray(response.data)) {
+      sessions = response.data;
+    } else if (response.data && response.data.sessions && Array.isArray(response.data.sessions)) {
+      sessions = response.data.sessions;
+    }
+    
+    // Sort sessions by most recently active (updatedAt or createdAt timestamp)
+    chatSessions.value = sessions.sort((a, b) => {
+      const dateA = new Date(a.updatedAt || a.createdAt || a.lastActive || 0);
+      const dateB = new Date(b.updatedAt || b.createdAt || b.lastActive || 0);
+      return dateB - dateA; // Descending order (most recent first)
+    });
+  } catch (error) {
+    console.error('Error fetching chat sessions:', error);
+    chatSessions.value = [];
+  } finally {
+    isLoadingSessions.value = false;
+  }
+};
+
+// Handle session click
+const handleSessionClick = (sessionId) => {
+  console.log('Mobile Session clicked:', sessionId);
+  // Navigate to chat with session ID
+  router.push('/chat');
+  // Emit event to load the specific session
+  emit('loadSession', sessionId);
+  // Close mobile sidebar after selecting
+  emit('close');
+};
+
+// Function to refresh chat sessions (called when new chat is created)
+const refreshChatSessions = () => {
+  fetchChatSessions();
+};
+
+// Fetch sessions on mount
+onMounted(() => {
+  fetchChatSessions();
+});
+
+// Expose refresh function to parent
+defineExpose({
+  refreshChatSessions
+});
 
 const handleSignOut = () => {
   // Handle sign out logic here

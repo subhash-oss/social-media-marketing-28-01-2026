@@ -41,7 +41,9 @@
     :initial-messages="messages" 
     :isSidebarCollapsed="isSidebarCollapsed" 
     :session-id="sessionId"
+    :external-session-id="loadedSessionId"
     @update:session-id="sessionId = $event"
+    @session-loaded="handleSessionLoaded"
     ref="chatPageRef" 
     class="flex-1" 
   />
@@ -65,6 +67,10 @@ const props = defineProps({
   isSidebarCollapsed: {
     type: Boolean,
     default: false
+  },
+  sessionToLoad: {
+    type: String,
+    default: null
   }
 });
 
@@ -73,8 +79,9 @@ const messages = ref([]);
 const chatPageRef = ref(null);
 const sessionId = ref(null);
 const isLoading = ref(false);
+const loadedSessionId = ref(null);
 
-const emit = defineEmits(['reset-complete']);
+const emit = defineEmits(['reset-complete', 'sessionLoaded', 'newSessionCreated']);
 
 // Watch for resetChat prop changes
 watch(() => props.resetChat, (newVal) => {
@@ -145,6 +152,8 @@ const handleFirstMessage = async (messageData) => {
     // Extract sessionId from response and store it
     if (response.data && response.data.sessionId) {
       sessionId.value = response.data.sessionId;
+      // Emit event that new session was created
+      emit('newSessionCreated', response.data.sessionId);
     }
     
     // Update the message with AI response
@@ -173,6 +182,22 @@ const handleNewChat = () => {
   messages.value = [];
   sessionId.value = null;
   isLoading.value = false;
+  loadedSessionId.value = null;
 };
+
+// Handle session loaded from ChatPage
+const handleSessionLoaded = (loadedId) => {
+  hasMessages.value = true;
+  emit('sessionLoaded', loadedId);
+};
+
+// Watch for sessionToLoad prop changes (from sidebar click)
+watch(() => props.sessionToLoad, (newSessionId) => {
+  if (newSessionId) {
+    loadedSessionId.value = newSessionId;
+    // Immediately show ChatPage so it can fetch and display history
+    hasMessages.value = true;
+  }
+}, { immediate: true });
 </script>
 

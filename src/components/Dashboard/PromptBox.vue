@@ -258,7 +258,6 @@ const fetchProducts = async () => {
   isLoadingProducts.value = true;
   try {
     const response = await api.get('/api/products');
-    console.log('Products API Response:', response.data);
     
     // Extract product names from response
     if (response.data && Array.isArray(response.data)) {
@@ -284,7 +283,6 @@ const fetchModels = async () => {
   isLoadingModels.value = true;
   try {
     const response = await api.get('/api/ai/models');
-    console.log('Models API Response:', response.data);
     
     // Extract model names from response
     if (response.data && Array.isArray(response.data)) {
