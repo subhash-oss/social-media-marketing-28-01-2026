@@ -248,6 +248,14 @@
                     Loading product…
                   </div>
 
+                  <!-- Deleted or no longer on server (GET 404 / after DELETE) -->
+                  <div
+                    v-else-if="message.typeData?.productId && productCreatedGone[message.typeData.productId]"
+                    class="body_3_regular tertiary_text_color py-6 text-center"
+                  >
+                    Product deleted
+                  </div>
+
                   <!-- Error -->
                   <div
                     v-else-if="message.typeData?.productId && productCreatedError[message.typeData.productId]"
@@ -1055,6 +1063,8 @@ const isInternalPath = (url) => typeof url === "string" && url.startsWith("/") &
 const productCreatedCache = reactive({});
 const productCreatedLoading = reactive({});
 const productCreatedError = reactive({});
+/** True after successful DELETE or GET /api/products/:id returns 404 (refresh / history). */
+const productCreatedGone = reactive({});
 const productCreatedOpenMenuId = ref(null);
 /** Local Active/Inactive state keyed by product id (aligned with Products list cards). */
 const productCreatedActiveOverrides = ref({});
@@ -1086,19 +1096,32 @@ const formatProductTypographyCss = (raw) => {
 const fetchProductCreatedDetails = async (productId) => {
   if (!productId || productCreatedLoading[productId]) return;
   if (productCreatedCache[productId]) return;
+  if (productCreatedGone[productId]) return;
   productCreatedLoading[productId] = true;
   productCreatedError[productId] = null;
   try {
-    const { data } = await api.get(`/api/products/${productId}`);
+    const { data } = await api.get(`/api/products/${encodeURIComponent(productId)}`);
     if (data && typeof data === "object") {
       productCreatedCache[productId] = data;
+      delete productCreatedGone[productId];
     } else {
       productCreatedError[productId] = "Invalid product response";
     }
   } catch (e) {
-    console.error("Failed to load product for chat card:", e);
-    productCreatedError[productId] =
-      e?.response?.data?.message || e?.message || "Failed to load product";
+    const status = e?.response?.status;
+    if (status === 404) {
+      productCreatedGone[productId] = true;
+      delete productCreatedError[productId];
+    } else {
+      console.error("Failed to load product for chat card:", e);
+      const msg =
+        e?.response?.data?.message ||
+        (typeof e?.message === "string" && !e.message.includes("status code")
+          ? e.message
+          : null);
+      productCreatedError[productId] =
+        msg || "Could not load product. Please try again.";
+    }
   } finally {
     productCreatedLoading[productId] = false;
   }
@@ -1157,6 +1180,7 @@ const handleProductCreatedDelete = async (productId) => {
     await api.delete(`/api/products/${encodeURIComponent(productId)}`);
     delete productCreatedCache[productId];
     delete productCreatedError[productId];
+    productCreatedGone[productId] = true;
   } catch (e) {
     console.error("Delete product failed:", e);
     productCreatedError[productId] =
