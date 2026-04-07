@@ -227,6 +227,131 @@
                 </div>
               </div>
 
+              <!-- AI Response: product created (card + CTAs from GET /api/products/:id) -->
+              <div
+                v-else-if="message.aiResponse && message.responseType === 'product_created'"
+                class="lg:px-3xl pt-3xl pb-md"
+              >
+                <div
+                  class="Body_2_regular primary_text_color pb-4 [&_a]:text-[#2563EB] [&_a]:underline"
+                  v-html="message.aiResponse"
+                />
+
+                <div
+                  class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.08)] md:p-5"
+                >
+                  <!-- Loading -->
+                  <div
+                    v-if="message.typeData?.productId && productCreatedLoading[message.typeData.productId]"
+                    class="body_3_regular tertiary_text_color py-6 text-center"
+                  >
+                    Loading product…
+                  </div>
+
+                  <!-- Error -->
+                  <div
+                    v-else-if="message.typeData?.productId && productCreatedError[message.typeData.productId]"
+                    class="body_3_regular text-red-600 py-4"
+                  >
+                    {{ productCreatedError[message.typeData.productId] }}
+                  </div>
+
+                  <!-- Card body -->
+                  <template
+                    v-else-if="message.typeData?.productId && productCreatedCache[message.typeData.productId]"
+                  >
+                    <div class="flex items-start justify-between gap-3 border-b border-[#E5E7EB] pb-4">
+                      <div class="flex min-w-0 flex-1 items-center gap-3">
+                        <img
+                          v-if="productCreatedCache[message.typeData.productId].brandLogoUrl"
+                          :src="productCreatedCache[message.typeData.productId].brandLogoUrl"
+                          :alt="productCreatedCache[message.typeData.productId].name || 'Brand'"
+                          class="h-10 w-10 shrink-0 rounded-lg object-contain bg-[#F9FAFB]"
+                        />
+                        <span class="truncate label_1_semibold primary_text_color">
+                          {{ productCreatedCache[message.typeData.productId].name }}
+                        </span>
+                      </div>
+                      <router-link
+                        to="/products"
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#596773] transition-colors hover:bg-[#F9FAFB]"
+                        aria-label="Product options"
+                      >
+                        <img :src="DotsIcon" alt="" class="h-4 w-4 opacity-80" />
+                      </router-link>
+                    </div>
+
+                    <div class="flex gap-0 pt-4">
+                      <div class="min-w-0 flex-1 pr-3 md:pr-4">
+                        <p class="body_4_regular tertiary_text_color mb-2">Brand colors</p>
+                        <div class="flex flex-wrap gap-2">
+                          <span
+                            v-for="(hex, cIdx) in productCreatedCache[message.typeData.productId].brandColors || []"
+                            :key="cIdx"
+                            class="inline-block h-7 w-7 shrink-0 rounded-md border border-[#E5E7EB] shadow-sm"
+                            :style="{ backgroundColor: hex }"
+                            :title="hex"
+                          />
+                        </div>
+                      </div>
+                      <div class="w-px shrink-0 self-stretch bg-[#E5E7EB]" aria-hidden="true" />
+                      <div class="min-w-0 flex-1 pl-3 md:pl-4">
+                        <p class="body_4_regular tertiary_text_color mb-2">Typography</p>
+                        <p
+                          class="label_1_semibold primary_text_color break-words"
+                          :style="{
+                            fontFamily: formatProductTypographyCss(
+                              productCreatedCache[message.typeData.productId].typography
+                            ),
+                          }"
+                        >
+                          {{ formatProductTypographyLabel(productCreatedCache[message.typeData.productId].typography) }}
+                        </p>
+                      </div>
+                    </div>
+                  </template>
+
+                  <div v-else class="body_3_regular tertiary_text_color py-4">
+                    No product details available.
+                  </div>
+                </div>
+
+                <!-- Suggested CTAs from AI `suggestedResponses` -->
+                <div
+                  v-if="message.suggestedResponses && message.suggestedResponses.length > 0"
+                  class="mt-4 flex flex-wrap gap-2"
+                >
+                  <template
+                    v-for="(suggestion, sIndex) in message.suggestedResponses"
+                    :key="sIndex"
+                  >
+                    <router-link
+                      v-if="suggestion.url && isInternalPath(suggestion.url)"
+                      :to="suggestion.url"
+                      class="inline-flex items-center rounded-full bg-[#EFF6FF] px-4 py-2 text-[#2563EB] label_2_medium transition-colors no-underline hover:bg-[#DBEAFE]"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </router-link>
+                    <a
+                      v-else-if="suggestion.url"
+                      :href="suggestion.url"
+                      class="inline-flex items-center rounded-full bg-[#EFF6FF] px-4 py-2 text-[#2563EB] label_2_medium transition-colors no-underline hover:bg-[#DBEAFE]"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </a>
+                    <button
+                      v-else
+                      type="button"
+                      class="inline-flex items-center rounded-full bg-[#EFF6FF] px-4 py-2 text-[#2563EB] label_2_medium transition-colors hover:bg-[#DBEAFE]"
+                      :disabled="isAiGenerating"
+                      @click="handleSuggestedResponse(suggestion, index)"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </button>
+                  </template>
+                </div>
+              </div>
+
               <!-- AI Response Content (default / conversation) -->
               <div v-else-if="message.aiResponse">
                 <div class="Body_2_regular primary_text_color lg:px-3xl pb-md pt-3xl" v-html="message.aiResponse"></div>
@@ -526,7 +651,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, watch, onMounted, onUnmounted, computed } from "vue";
+import { ref, reactive, nextTick, watch, onMounted, onUnmounted, computed } from "vue";
 import PromptBox from "../PromptBox.vue";
 import ImageEditIcon from "../../../assets/images/ImageEditIcon.svg";
 import TextCopyIcon from "../../../assets/images/TextCopyIcon.svg";
@@ -864,6 +989,72 @@ const showPostMarketingCaption = (message) => {
 };
 
 const isInternalPath = (url) => typeof url === "string" && url.startsWith("/") && !url.startsWith("//");
+
+/** Cached GET /api/products/:id for product_created chat messages */
+const productCreatedCache = reactive({});
+const productCreatedLoading = reactive({});
+const productCreatedError = reactive({});
+
+const formatProductTypographyLabel = (raw) => {
+  if (raw == null || raw === "") return "—";
+  const t = String(raw).trim();
+  try {
+    const j = JSON.parse(t);
+    if (Array.isArray(j) && j.length) return String(j[0]);
+    if (typeof j === "string") return j;
+  } catch {
+    /* not JSON */
+  }
+  const quoted = t.match(/"([^"]+)"/);
+  if (quoted) return quoted[1];
+  const stripped = t.replace(/^\{/, "").replace(/\}$/, "").split(",")[0];
+  if (stripped) return stripped.replace(/^["']|["']$/g, "").trim();
+  return t;
+};
+
+/** Safe stack for previewing the primary font in the card */
+const formatProductTypographyCss = (raw) => {
+  const label = formatProductTypographyLabel(raw);
+  if (!label || label === "—") return "inherit";
+  return `"${label.replace(/"/g, '\\"')}", ui-sans-serif, system-ui, sans-serif`;
+};
+
+const fetchProductCreatedDetails = async (productId) => {
+  if (!productId || productCreatedLoading[productId]) return;
+  if (productCreatedCache[productId]) return;
+  productCreatedLoading[productId] = true;
+  productCreatedError[productId] = null;
+  try {
+    const { data } = await api.get(`/api/products/${productId}`);
+    if (data && typeof data === "object") {
+      productCreatedCache[productId] = data;
+    } else {
+      productCreatedError[productId] = "Invalid product response";
+    }
+  } catch (e) {
+    console.error("Failed to load product for chat card:", e);
+    productCreatedError[productId] =
+      e?.response?.data?.message || e?.message || "Failed to load product";
+  } finally {
+    productCreatedLoading[productId] = false;
+  }
+};
+
+watch(
+  () =>
+    messages.value.map((m) => ({
+      rt: m.responseType,
+      pid: m.typeData?.productId,
+    })),
+  () => {
+    messages.value.forEach((m) => {
+      if (m.responseType === "product_created" && m.typeData?.productId) {
+        fetchProductCreatedDetails(m.typeData.productId);
+      }
+    });
+  },
+  { deep: true, immediate: true }
+);
 
 const handleCopyPostGenerated = async (message) => {
   const main = plainTextFromAi(message?.aiResponse);
