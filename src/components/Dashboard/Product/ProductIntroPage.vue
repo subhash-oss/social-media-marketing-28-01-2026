@@ -36,13 +36,13 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
-            <button
+            <!-- <button
               type="button"
               class="inline-flex items-center gap-2 rounded-lg border primary_border_color bg_secondary_color px-xl py-md label_2_medium primary_text_color hover:bg-gray-25"
             >
               <img :src="PostFilterIcon" alt="" class="h-4 w-4" />
               Filter
-            </button>
+            </button> -->
             <button
               type="button"
               @click="$emit('add-product')"
@@ -76,31 +76,54 @@
             <div class="relative shrink-0" data-product-card-menu>
               <button
                 type="button"
-                class="rounded-md p-1 hover:bg-gray-25"
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-25 transition-colors hover:bg-gray-50"
                 :aria-expanded="openMenuId === product.id"
                 aria-label="Product options"
                 @click.stop="toggleMenu(product.id)"
               >
-                <img :src="ThreeDotsIcon" alt="" class="h-5 w-5" />
+                <img :src="ThreeDotsIcon" alt="" class="h-5 w-5 opacity-70" />
               </button>
               <div
                 v-if="openMenuId === product.id"
-                class="absolute right-0 z-10 mt-1 min-w-[140px] rounded-lg border primary_border_color bg_secondary_color py-1 shadow-md"
+                class="absolute right-0 z-10 mt-2 w-[min(calc(100vw-2rem),260px)] min-w-[220px] overflow-hidden rounded-xl border primary_border_color bg_secondary_color shadow-lg"
                 @click.stop
               >
+                <div class="flex items-center justify-between gap-3 px-4 py-3.5">
+                  <span class="label_2_medium primary_text_color">Active / Inactive</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    :aria-checked="isProductActive(product)"
+                    class="inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full px-[3px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
+                    :class="
+                      isProductActive(product)
+                        ? 'justify-end bg-emerald-500'
+                        : 'justify-start bg-gray-200'
+                    "
+                    @click.stop="toggleProductActive(product)"
+                  >
+                    <span
+                      class="pointer-events-none h-5 w-5 rounded-full bg-white shadow-sm ring-1 ring-black/5"
+                    />
+                  </button>
+                </div>
+                <div class="h-px w-full bg-gray-25" aria-hidden="true" />
                 <button
                   type="button"
-                  class="block w-full px-4 py-2 text-left label_2_medium primary_text_color hover:bg-gray-25"
+                  class="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left label_2_medium primary_text_color transition-colors hover:bg-gray-25"
                   @click="closeMenu"
                 >
-                  Edit
+                  <span>Edit</span>
+                  <img :src="ImageEditIcon" alt="" class="h-4 w-4 shrink-0 opacity-80" />
                 </button>
+                <div class="h-px w-full bg-gray-25" aria-hidden="true" />
                 <button
                   type="button"
-                  class="block w-full px-4 py-2 text-left label_2_medium text-red-600 hover:bg-gray-25"
+                  class="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left label_2_medium primary_text_color transition-colors hover:bg-gray-25"
                   @click="closeMenu"
                 >
-                  Delete
+                  <span>Delete</span>
+                  <img :src="TrashIcon" alt="" class="h-4 w-4 shrink-0 opacity-80" />
                 </button>
               </div>
             </div>
@@ -193,6 +216,8 @@ import ProductIntroImage from "../../../assets/images/ProductIntroImage.png";
 import PlusIconWhite from "../../../assets/images/PlusIconWhite.svg";
 import PostFilterIcon from "../../../assets/images/PostFilter.svg";
 import ThreeDotsIcon from "../../../assets/images/ThreeDotsIcon.svg";
+import ImageEditIcon from "../../../assets/images/ImageEditIcon.svg";
+import TrashIcon from "../../../assets/images/TrashIcon.svg";
 import InstagramIcon from "../../../assets/images/InstagramIcon.svg";
 import FacebookIcon from "../../../assets/images/FacebookIcon.svg";
 import LinkedInIcon from "../../../assets/images/LinkedInIcon.svg";
@@ -207,6 +232,8 @@ const products = ref([]);
 const isLoading = ref(true);
 const searchQuery = ref("");
 const openMenuId = ref(null);
+/** Local toggle state keyed by product id; falls back to API `isActive` when unset. */
+const activeOverrides = ref({});
 
 const platformMap = {
   instagram: InstagramIcon,
@@ -337,6 +364,23 @@ function displayPlatforms(product) {
 function platformIcon(key) {
   const k = String(key).toLowerCase();
   return platformMap[k] || PlatformIcon;
+}
+
+function isProductActive(product) {
+  const id = product.id;
+  if (activeOverrides.value[id] !== undefined) {
+    return activeOverrides.value[id];
+  }
+  if (product.isActive !== undefined && product.isActive !== null) {
+    return Boolean(product.isActive);
+  }
+  return true;
+}
+
+function toggleProductActive(product) {
+  const id = product.id;
+  const next = !isProductActive(product);
+  activeOverrides.value = { ...activeOverrides.value, [id]: next };
 }
 
 function toggleMenu(id) {
