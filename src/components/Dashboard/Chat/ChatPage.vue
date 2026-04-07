@@ -238,7 +238,7 @@
                 />
 
                 <div
-                  class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.08)] md:p-5"
+                  class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.08)] md:p-5 w-[52%]"
                 >
                   <!-- Loading -->
                   <div
@@ -272,13 +272,70 @@
                           {{ productCreatedCache[message.typeData.productId].name }}
                         </span>
                       </div>
-                      <router-link
-                        to="/products"
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#596773] transition-colors hover:bg-[#F9FAFB]"
-                        aria-label="Product options"
-                      >
-                        <img :src="DotsIcon" alt="" class="h-4 w-4 opacity-80" />
-                      </router-link>
+                      <div class="relative shrink-0" data-chat-product-card-menu>
+                        <button
+                          type="button"
+                          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#596773] transition-colors hover:bg-[#F9FAFB]"
+                          :aria-expanded="productCreatedOpenMenuId === message.typeData.productId"
+                          aria-label="Product options"
+                          @click.stop="toggleProductCreatedCardMenu(message.typeData.productId)"
+                        >
+                          <img :src="DotsIcon" alt="" class="h-4 w-4 opacity-80" />
+                        </button>
+                        <div
+                          v-if="productCreatedOpenMenuId === message.typeData.productId"
+                          class="absolute right-0 z-[20] mt-2 w-[min(calc(100vw-2rem),260px)] min-w-[220px] overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-lg"
+                          @click.stop
+                        >
+                          <div class="flex items-center justify-between gap-3 px-4 py-3.5">
+                            <span class="label_2_medium primary_text_color">Active / Inactive</span>
+                            <button
+                              type="button"
+                              role="switch"
+                              :aria-checked="
+                                isChatProductCardActive(
+                                  productCreatedCache[message.typeData.productId]
+                                )
+                              "
+                              class="inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full px-[3px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
+                              :class="
+                                isChatProductCardActive(
+                                  productCreatedCache[message.typeData.productId]
+                                )
+                                  ? 'justify-end bg-emerald-500'
+                                  : 'justify-start bg-gray-200'
+                              "
+                              @click.stop="
+                                toggleChatProductCardActive(
+                                  productCreatedCache[message.typeData.productId]
+                                )
+                              "
+                            >
+                              <span
+                                class="pointer-events-none h-5 w-5 rounded-full bg-white shadow-sm ring-1 ring-black/5"
+                              />
+                            </button>
+                          </div>
+                          <div class="h-px w-full bg-[#E5E7EB]" aria-hidden="true" />
+                          <button
+                            type="button"
+                            class="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left label_2_medium primary_text_color transition-colors hover:bg-[#F9FAFB]"
+                            @click="handleProductCreatedEdit"
+                          >
+                            <span>Edit</span>
+                            <img :src="ImageEditIcon" alt="" class="h-4 w-4 shrink-0 opacity-80" />
+                          </button>
+                          <div class="h-px w-full bg-[#E5E7EB]" aria-hidden="true" />
+                          <button
+                            type="button"
+                            class="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left label_2_medium primary_text_color transition-colors hover:bg-[#F9FAFB]"
+                            @click.stop="handleProductCreatedDelete(message.typeData.productId)"
+                          >
+                            <span>Delete</span>
+                            <img :src="TrashIcon" alt="" class="h-4 w-4 shrink-0 opacity-80" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
                     <div class="flex gap-0 pt-4">
@@ -652,8 +709,10 @@
 
 <script setup>
 import { ref, reactive, nextTick, watch, onMounted, onUnmounted, computed } from "vue";
+import { useRouter } from "vue-router";
 import PromptBox from "../PromptBox.vue";
 import ImageEditIcon from "../../../assets/images/ImageEditIcon.svg";
+import TrashIcon from "../../../assets/images/TrashIcon.svg";
 import TextCopyIcon from "../../../assets/images/TextCopyIcon.svg";
 import RestartIcon from "../../../assets/images/RestartIcon.svg";
 import closeIcon from "../../../assets/images/closeIcon.svg";
@@ -696,6 +755,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:sessionId', 'sessionLoaded']);
 
+const router = useRouter();
 
 const messages = ref([...props.initialMessages]);
 const editingIndex = ref(null);
@@ -725,6 +785,7 @@ const showPostMenuChat = ref(false);
 const dotsButtonRefChat = ref(null);
 const togglePostModalRefChat = ref(null);
 let removePostMenuDocClick = null;
+let removeProductCreatedMenuDocClick = null;
 let mediaQueryLg;
 
 const formatDateToString = (date) => {
@@ -994,6 +1055,9 @@ const isInternalPath = (url) => typeof url === "string" && url.startsWith("/") &
 const productCreatedCache = reactive({});
 const productCreatedLoading = reactive({});
 const productCreatedError = reactive({});
+const productCreatedOpenMenuId = ref(null);
+/** Local Active/Inactive state keyed by product id (aligned with Products list cards). */
+const productCreatedActiveOverrides = ref({});
 
 const formatProductTypographyLabel = (raw) => {
   if (raw == null || raw === "") return "—";
@@ -1055,6 +1119,65 @@ watch(
   },
   { deep: true, immediate: true }
 );
+
+const isChatProductCardActive = (product) => {
+  if (!product?.id) return true;
+  const id = product.id;
+  if (productCreatedActiveOverrides.value[id] !== undefined) {
+    return productCreatedActiveOverrides.value[id];
+  }
+  if (product.isActive !== undefined && product.isActive !== null) {
+    return Boolean(product.isActive);
+  }
+  return true;
+};
+
+const toggleChatProductCardActive = (product) => {
+  if (!product?.id) return;
+  const id = product.id;
+  const next = !isChatProductCardActive(product);
+  productCreatedActiveOverrides.value = { ...productCreatedActiveOverrides.value, [id]: next };
+};
+
+const toggleProductCreatedCardMenu = (productId) => {
+  productCreatedOpenMenuId.value =
+    productCreatedOpenMenuId.value === productId ? null : productId;
+};
+
+const handleProductCreatedEdit = () => {
+  productCreatedOpenMenuId.value = null;
+  router.push("/products");
+};
+
+/** DELETE /api/products/:id — removes product; `id` is PRODUCT_UUID */
+const handleProductCreatedDelete = async (productId) => {
+  if (!productId) return;
+  productCreatedOpenMenuId.value = null;
+  try {
+    await api.delete(`/api/products/${encodeURIComponent(productId)}`);
+    delete productCreatedCache[productId];
+    delete productCreatedError[productId];
+  } catch (e) {
+    console.error("Delete product failed:", e);
+    productCreatedError[productId] =
+      e?.response?.data?.message || e?.message || "Could not delete product";
+  }
+};
+
+watch(productCreatedOpenMenuId, (id) => {
+  if (removeProductCreatedMenuDocClick) {
+    document.removeEventListener("click", removeProductCreatedMenuDocClick, true);
+    removeProductCreatedMenuDocClick = null;
+  }
+  if (!id) return;
+  nextTick(() => {
+    removeProductCreatedMenuDocClick = (e) => {
+      if (e.target.closest("[data-chat-product-card-menu]")) return;
+      productCreatedOpenMenuId.value = null;
+    };
+    document.addEventListener("click", removeProductCreatedMenuDocClick, true);
+  });
+});
 
 const handleCopyPostGenerated = async (message) => {
   const main = plainTextFromAi(message?.aiResponse);
@@ -1499,6 +1622,9 @@ onMounted(() => {
 onUnmounted(() => {
   if (removePostMenuDocClick) {
     document.removeEventListener("click", removePostMenuDocClick, true);
+  }
+  if (removeProductCreatedMenuDocClick) {
+    document.removeEventListener("click", removeProductCreatedMenuDocClick, true);
   }
   mediaQueryLg?.removeEventListener("change", updateIsLgUp);
 });
