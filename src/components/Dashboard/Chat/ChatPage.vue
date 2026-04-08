@@ -227,6 +227,154 @@
                 </div>
               </div>
 
+              <!-- AI Response: connect social platforms (grid + suggested pills + actions) -->
+              <div
+                v-else-if="message.aiResponse && message.responseType === 'social_platforms'"
+                class="lg:px-3xl pt-3xl pb-md"
+              >
+                <p
+                  class="Body_2_regular primary_text_color pb-4 [&_strong]:font-semibold"
+                  v-html="message.aiResponse"
+                />
+
+                <div
+                  v-if="message.typeData?.platforms?.length"
+                  class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 pb-4"
+                >
+                  <button
+                    v-for="(platform, pIdx) in message.typeData.platforms"
+                    :key="platform.name || pIdx"
+                    type="button"
+                    class="flex w-full min-w-0 items-center gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors"
+                    :class="
+                      platform.connected
+                        ? 'cursor-not-allowed opacity-50'
+                        : 'cursor-pointer hover:bg-[#F9FAFB]'
+                    "
+                    :disabled="Boolean(platform.connected)"
+                    :aria-label="
+                      platform.connected
+                        ? `${platform.label} — connected`
+                        : `Connect ${platform.label}`
+                    "
+                    @click="goToSocialPlatformAuth(platform.authUrl)"
+                  >
+                    <img
+                      :src="platform.icon"
+                      :alt="platform.label || platform.name || 'Platform'"
+                      class="h-8 w-8 shrink-0 object-contain"
+                    />
+                    <span class="min-w-0 flex-1 truncate label_2_medium primary_text_color">
+                      {{ platform.label }}
+                    </span>
+                    <span
+                      v-if="!platform.connected"
+                      class="flex h-8 w-8 shrink-0 items-center justify-center text-[#596773]"
+                      aria-hidden="true"
+                    >
+                      <svg
+                        class="h-5 w-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 5v14M5 12h14"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </span>
+                    <span
+                      v-else
+                      class="flex h-8 w-8 shrink-0 items-center justify-center text-emerald-600"
+                      aria-hidden="true"
+                    >
+                      <svg
+                        class="h-5 w-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M20 6L9 17l-5-5"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+
+                <div
+                  v-if="message.suggestedResponses && message.suggestedResponses.length > 0"
+                  class="flex flex-wrap gap-2"
+                >
+                  <template
+                    v-for="(suggestion, sIndex) in message.suggestedResponses"
+                    :key="sIndex"
+                  >
+                    <router-link
+                      v-if="suggestion.url && isInternalPath(suggestion.url)"
+                      :to="suggestion.url"
+                      class="inline-flex items-center px-4 py-2 rounded-full bg-[#EFF6FF] text-[#2563EB] label_2_medium hover:bg-[#DBEAFE] transition-colors no-underline"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </router-link>
+                    <a
+                      v-else-if="suggestion.url"
+                      :href="suggestion.url"
+                      class="inline-flex items-center px-4 py-2 rounded-full bg-[#EFF6FF] text-[#2563EB] label_2_medium hover:bg-[#DBEAFE] transition-colors no-underline"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </a>
+                    <button
+                      v-else
+                      type="button"
+                      @click="handleSuggestedResponse(suggestion, index)"
+                      class="inline-flex items-center px-4 py-2 rounded-full bg-[#EFF6FF] text-[#2563EB] label_2_medium hover:bg-[#DBEAFE] transition-colors"
+                      :disabled="isAiGenerating"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </button>
+                  </template>
+                </div>
+
+                <div class="flex items-center gap-sm mt-4xl">
+                  <button
+                    type="button"
+                    @click="handleCopyAIResponse(message.aiResponse, index)"
+                    class="flex items-center justify-center w-4xl h-4xl cursor-pointer"
+                    title="Copy"
+                  >
+                    <img :src="TextCopyIcon" alt="Copy" />
+                  </button>
+                  <button
+                    type="button"
+                    @click="handleLike(index)"
+                    class="flex items-center justify-center w-4xl h-4xl cursor-pointer"
+                    title="Like"
+                  >
+                    <svg class="w-4xl h-4xl" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 8.25V14.25C5.25 14.4489 5.17098 14.6397 5.03033 14.7803C4.88968 14.921 4.69891 15 4.5 15H3C2.80109 15 2.61032 14.921 2.46967 14.7803C2.32902 14.6397 2.25 14.4489 2.25 14.25V9C2.25 8.80109 2.32902 8.61032 2.46967 8.46967C2.61032 8.32902 2.80109 8.25 3 8.25H5.25ZM5.25 8.25C6.04565 8.25 6.80871 7.93393 7.37132 7.37132C7.93393 6.80871 8.25 6.04565 8.25 5.25V4.5C8.25 4.10218 8.40804 3.72064 8.68934 3.43934C8.97064 3.15804 9.35218 3 9.75 3C10.1478 3 10.5294 3.15804 10.8107 3.43934C11.092 3.72064 11.25 4.10218 11.25 4.5V8.25H13.5C13.8978 8.25 14.2794 8.40804 14.5607 8.68934C14.842 8.97064 15 9.35218 15 9.75L14.25 13.5C14.1421 13.9601 13.9375 14.3552 13.667 14.6257C13.3964 14.8963 13.0746 15.0276 12.75 15H7.5C6.90326 15 6.33097 14.7629 5.90901 14.341C5.48705 13.919 5.25 13.3467 5.25 12.75" :stroke="message.isLiked ? '#7950F2' : '#596773'" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    @click="handleDislike(index)"
+                    class="flex items-center justify-center w-4xl h-4xl cursor-pointer"
+                    title="Dislike"
+                  >
+                    <svg class="w-4xl h-4xl" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 9.74971V3.74971C5.25 3.55079 5.17098 3.36003 5.03033 3.21938C4.88968 3.07872 4.69891 2.99971 4.5 2.99971H3C2.80109 2.99971 2.61032 3.07872 2.46967 3.21938C2.32902 3.36003 2.25 3.55079 2.25 3.74971V8.99971C2.25 9.19862 2.32902 9.38938 2.46967 9.53004C2.61032 9.67069 2.80109 9.74971 3 9.74971H5.25ZM5.25 9.74971C6.04565 9.74971 6.80871 10.0658 7.37132 10.6284C7.93393 11.191 8.25 11.9541 8.25 12.7497V13.4997C8.25 13.8975 8.40804 14.2791 8.68934 14.5604C8.97064 14.8417 9.35218 14.9997 9.75 14.9997C10.1478 14.9997 10.5294 14.8417 10.8107 14.5604C11.092 14.2791 11.25 13.8975 11.25 13.4997V9.74971H13.5C13.8978 9.74971 14.2794 9.59167 14.5607 9.31036C14.842 9.02906 15 8.64753 15 8.24971L14.25 4.49971C14.1421 4.0396 13.9375 3.64452 13.667 3.37398C13.3964 3.10344 13.0746 2.97209 12.75 2.99971H7.5C6.90326 2.99971 6.33097 3.23676 5.90901 3.65872C5.48705 4.08067 5.25 4.65297 5.25 5.24971" :stroke="message.isDisliked ? '#DC2626' : '#596773'" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
               <!-- AI Response: product created (card + CTAs from GET /api/products/:id) -->
               <div
                 v-else-if="message.aiResponse && message.responseType === 'product_created'"
@@ -1058,6 +1206,15 @@ const showPostMarketingCaption = (message) => {
 };
 
 const isInternalPath = (url) => typeof url === "string" && url.startsWith("/") && !url.startsWith("//");
+
+const goToSocialPlatformAuth = (authUrl) => {
+  if (!authUrl || typeof authUrl !== "string") return;
+  if (isInternalPath(authUrl)) {
+    router.push(authUrl);
+  } else {
+    window.location.href = authUrl;
+  }
+};
 
 /** Cached GET /api/products/:id for product_created chat messages */
 const productCreatedCache = reactive({});
