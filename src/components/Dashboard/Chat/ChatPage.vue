@@ -257,7 +257,7 @@
                         ? `${platform.label} — connected`
                         : `Connect ${platform.label}`
                     "
-                    @click="goToSocialPlatformAuth(platform.authUrl)"
+                    @click="goToSocialPlatformAuth(platform.authUrl, platform.name)"
                   >
                     <img
                       :src="platform.icon"
@@ -562,6 +562,84 @@
                       {{ suggestion.text || suggestion }}
                     </button>
                   </template>
+                </div>
+              </div>
+
+              <!-- AI Response: analytics report (narrative + HTML table from typeData.analyticsHtml) -->
+              <div
+                v-else-if="message.aiResponse && message.responseType === 'analytics_report'"
+                class="lg:px-3xl pt-3xl pb-md"
+              >
+                <div
+                  class="Body_2_regular primary_text_color pb-4 [&_a]:text-[#2563EB] [&_a]:underline [&_strong]:font-semibold"
+                  v-html="formatAnalyticsReportNarrative(message.aiResponse)"
+                />
+                <div
+                  v-if="message.typeData?.analyticsHtml"
+                  class="analytics-report-panel mb-4 max-w-full overflow-x-auto rounded-xl border border-slate-700/40 bg-[#0f172a] p-3 shadow-inner"
+                >
+                  <div
+                    class="analytics-report-html text-left [&_table]:max-w-none"
+                    v-html="message.typeData.analyticsHtml"
+                  />
+                </div>
+
+                <div
+                  v-if="message.suggestedResponses && message.suggestedResponses.length > 0"
+                  class="mt-1 flex flex-wrap gap-2"
+                >
+                  <template
+                    v-for="(suggestion, sIndex) in message.suggestedResponses"
+                    :key="sIndex"
+                  >
+                    <a
+                      v-if="suggestion.url"
+                      :href="suggestion.url"
+                      class="rounded-full border border-[#3B82F6] px-4 py-2 text-[#3B82F6] label_2_medium transition-colors no-underline hover:bg-blue-50"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </a>
+                    <button
+                      v-else
+                      type="button"
+                      class="rounded-full border border-[#3B82F6] px-4 py-2 text-[#3B82F6] label_2_medium transition-colors hover:bg-blue-50"
+                      :disabled="isAiGenerating"
+                      @click="handleSuggestedResponse(suggestion, index)"
+                    >
+                      {{ suggestion.text || suggestion }}
+                    </button>
+                  </template>
+                </div>
+
+                <div class="mt-4xl flex items-center gap-sm">
+                  <button
+                    type="button"
+                    class="flex h-4xl w-4xl cursor-pointer items-center justify-center"
+                    title="Copy"
+                    @click="handleCopyAIResponse(message.aiResponse, index)"
+                  >
+                    <img :src="TextCopyIcon" alt="Copy" />
+                  </button>
+                  <button
+                    type="button"
+                    class="flex h-4xl w-4xl cursor-pointer items-center justify-center"
+                    title="Like"
+                    @click="handleLike(index)"
+                  >
+                    <svg width="60" height="60" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 8.25V14.25C5.25 14.4489 5.17098 14.6397 5.03033 14.7803C4.88968 14.921 4.69891 15 4.5 15H3C2.80109 15 2.61032 14.921 2.46967 14.7803C2.32902 14.6397 2.25 14.4489 2.25 14.25V9C2.25 8.80109 2.32902 8.61032 2.46967 8.46967C2.61032 8.32902 2.80109 8.25 3 8.25H5.25ZM5.25 8.25C6.04565 8.25 6.80871 7.93393 7.37132 7.37132C7.93393 6.80871 8.25 6.04565 8.25 5.25V4.5C8.25 4.10218 8.40804 3.72064 8.68934 3.43934C8.97064 3.15804 9.35218 3 9.75 3C10.1478 3 10.5294 3.15804 10.8107 3.43934C11.092 3.72064 11.25 4.10218 11.25 4.5V8.25H13.5C13.8978 8.25 14.2794 8.40804 14.5607 8.68934C14.842 8.97064 15 9.35218 15 9.75L14.25 13.5C14.1421 13.9601 13.9375 14.3552 13.667 14.6257C13.3964 14.8963 13.0746 15.0276 12.75 15H7.5C6.90326 15 6.33097 14.7629 5.90901 14.341C5.48705 13.919 5.25 13.3467 5.25 12.75" :stroke="message.isLiked ? '#7950F2' : '#596773'" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="flex h-4xl w-4xl cursor-pointer items-center justify-center transition-colors"
+                    title="Dislike"
+                    @click="handleDislike(index)"
+                  >
+                    <svg width="60" height="60" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 9.74971V3.74971C5.25 3.55079 5.17098 3.36003 5.03033 3.21938C4.88968 3.07872 4.69891 2.99971 4.5 2.99971H3C2.80109 2.99971 2.61032 3.07872 2.46967 3.21938C2.32902 3.36003 2.25 3.55079 2.25 3.74971V8.99971C2.25 9.19862 2.32902 9.38938 2.46967 9.53004C2.61032 9.67069 2.80109 9.74971 3 9.74971H5.25ZM5.25 9.74971C6.04565 9.74971 6.80871 10.0658 7.37132 10.6284C7.93393 11.191 8.25 11.9541 8.25 12.7497V13.4997C8.25 13.8975 8.40804 14.2791 8.68934 14.5604C8.97064 14.8417 9.35218 14.9997 9.75 14.9997C10.1478 14.9997 10.5294 14.8417 10.8107 14.5604C11.092 14.2791 11.25 13.8975 11.25 13.4997V9.74971H13.5C13.8978 9.74971 14.2794 9.59167 14.5607 9.31036C14.842 9.02906 15 8.64753 15 8.24971L14.25 4.49971C14.1421 4.0396 13.9375 3.64452 13.667 3.37398C13.3964 3.10344 13.0746 2.97209 12.75 2.99971H7.5C6.90326 2.99971 6.33097 3.23676 5.90901 3.65872C5.48705 4.08067 5.25 4.65297 5.25 5.24971" :stroke="message.isDisliked ? '#DC2626' : '#596773'" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
                 </div>
               </div>
 
@@ -888,7 +966,7 @@ import YoutubeIcon from "../../../assets/images/YoutubeIcon.svg";
 import SocialMediaModal from "../../Calendar/SocialMediaModal.vue";
 import SchedulerCalendarModal from "../../Calendar/SchedulerCalendarModal.vue";
 import TogglePostModal from "../../Calendar/TogglePostModal.vue";
-import api from "../../../services/api.js";
+import api, { TOKEN_KEY } from "../../../services/api.js";
 
 const props = defineProps({
   initialMessages: {
@@ -909,7 +987,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:sessionId', 'sessionLoaded']);
+const emit = defineEmits(['update:sessionId', 'sessionLoaded', 'socialAuthLinked']);
 
 const router = useRouter();
 
@@ -943,6 +1021,8 @@ const togglePostModalRefChat = ref(null);
 let removePostMenuDocClick = null;
 let removeProductCreatedMenuDocClick = null;
 let mediaQueryLg;
+/** Interval for OAuth popup completion polling */
+let socialAuthPollIntervalId = null;
 
 const formatDateToString = (date) => {
   const y = date.getFullYear();
@@ -1180,6 +1260,34 @@ const plainTextFromAi = (value) => {
   return (temp.textContent || temp.innerText || "").trim();
 };
 
+const escapeHtmlForNarrative = (str) =>
+  String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+/** Analytics report API `message` text: **bold**, `* ` bullets, paragraphs — safe HTML for v-html. */
+const formatAnalyticsReportNarrative = (raw) => {
+  if (raw == null || raw === "") return "";
+  let text = escapeHtmlForNarrative(String(raw));
+  text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  const blocks = text.split(/\n\n+/);
+  return blocks
+    .map((block) => {
+      const lines = block.split(/\n/);
+      const trimmed = lines.map((l) => l.trim());
+      const nonEmpty = trimmed.filter((l) => l.length > 0);
+      if (nonEmpty.length > 0 && nonEmpty.every((l) => l.startsWith("* "))) {
+        const items = nonEmpty.map((l) => `<li>${l.slice(2)}</li>`).join("");
+        return `<ul class="list-disc pl-5 my-2 space-y-1">${items}</ul>`;
+      }
+      const inner = lines.map((l) => (l.trim() === "" ? "<br />" : l)).join("<br />");
+      return `<p class="my-2">${inner}</p>`;
+    })
+    .join("");
+};
+
 const postGeneratedImageUrls = (message) => {
   const raw = message?.typeData?.generatedImage;
   if (!raw) return [];
@@ -1207,13 +1315,88 @@ const showPostMarketingCaption = (message) => {
 
 const isInternalPath = (url) => typeof url === "string" && url.startsWith("/") && !url.startsWith("//");
 
-const goToSocialPlatformAuth = (authUrl) => {
+/**
+ * Opens OAuth in a popup; appends `token` from localStorage (TOKEN_KEY).
+ * Relative `authUrl` is resolved with axios `baseURL` from `src/services/api.js`.
+ * Polls until the popup closes or the callback URL indicates success (e.g. `linked=` in query).
+ */
+const goToSocialPlatformAuth = (authUrl, platformName = "") => {
   if (!authUrl || typeof authUrl !== "string") return;
-  if (isInternalPath(authUrl)) {
-    router.push(authUrl);
-  } else {
-    window.location.href = authUrl;
+
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    console.warn("Social connect: no access token; sign in required.");
+    return;
   }
+
+  const apiBase = api.defaults.baseURL;
+  if (!apiBase || typeof apiBase !== "string") {
+    console.error("Social connect: backend base URL is not set in api.js.");
+    return;
+  }
+
+  let fullUrl;
+  try {
+    if (/^https?:\/\//i.test(authUrl)) {
+      fullUrl = new URL(authUrl);
+    } else {
+      const path = authUrl.startsWith("/") ? authUrl : `/${authUrl}`;
+      fullUrl = new URL(path, apiBase);
+    }
+    fullUrl.searchParams.set("token", token);
+  } catch (e) {
+    console.error("Social connect: invalid auth URL", e);
+    return;
+  }
+
+  const slug = String(platformName || "oauth").replace(/\W+/g, "_");
+  const windowName = `SocialAuth_${slug}`;
+  const popup = window.open(
+    fullUrl.toString(),
+    windowName,
+    "width=600,height=700,scrollbars=yes,resizable=yes"
+  );
+
+  if (!popup) {
+    console.warn("Social connect: popup was blocked.");
+    return;
+  }
+
+  if (socialAuthPollIntervalId) {
+    clearInterval(socialAuthPollIntervalId);
+    socialAuthPollIntervalId = null;
+  }
+
+  socialAuthPollIntervalId = setInterval(() => {
+    try {
+      if (popup.closed) {
+        if (socialAuthPollIntervalId) {
+          clearInterval(socialAuthPollIntervalId);
+          socialAuthPollIntervalId = null;
+        }
+        return;
+      }
+      const href = popup.location.href;
+      const done =
+        href.includes("linked=") ||
+        /[?&]linked(?:&|$)/.test(href) ||
+        href.includes("auth/success");
+      if (done) {
+        if (socialAuthPollIntervalId) {
+          clearInterval(socialAuthPollIntervalId);
+          socialAuthPollIntervalId = null;
+        }
+        try {
+          popup.close();
+        } catch {
+          /* ignore */
+        }
+        emit("socialAuthLinked", { platform: platformName, href });
+      }
+    } catch {
+      /* cross-origin while on provider — expected */
+    }
+  }, 500);
 };
 
 /** Cached GET /api/products/:id for product_created chat messages */
@@ -1806,6 +1989,10 @@ onUnmounted(() => {
   }
   if (removeProductCreatedMenuDocClick) {
     document.removeEventListener("click", removeProductCreatedMenuDocClick, true);
+  }
+  if (socialAuthPollIntervalId) {
+    clearInterval(socialAuthPollIntervalId);
+    socialAuthPollIntervalId = null;
   }
   mediaQueryLg?.removeEventListener("change", updateIsLgUp);
 });

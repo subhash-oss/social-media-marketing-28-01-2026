@@ -2,8 +2,11 @@ import axios from "axios"
 
 const TOKEN_KEY = "access_token"
 
+/** Backend API origin — single source for axios `baseURL` and for consumers that read `api.defaults.baseURL` */
+export const API_BASE_URL = "https://griffon-precious-basilisk.ngrok-free.app/"
+
 const api = axios.create({
-  baseURL: "https://griffon-precious-basilisk.ngrok-free.app/",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
     'ngrok-skip-browser-warning': 'true',
