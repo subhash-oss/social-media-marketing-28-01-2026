@@ -20,14 +20,14 @@
     <!-- User Account Card 1 -->
     <div>
       <div class="flex items-center gap-5 rounded-lg bg_secondary_color">
-        <img 
-          src="https://i.pravatar.cc/40" 
-          class="h-10 w-10 rounded-full" 
+        <img
+          :src="avatarUrl || fallbackAvatar"
+          class="h-10 w-10 rounded-full object-cover"
           alt="Profile"
         />
         <div class="flex-1 min-w-0">
-          <p class="label_2_semibold primary_text_color">Cliff Booth</p>
-          <p class="body_4_regular tertiary_text_color">Cliffbooth@gmail.com</p>
+          <p class="label_2_semibold primary_text_color truncate">{{ displayName || "—" }}</p>
+          <p class="body_4_regular tertiary_text_color truncate">{{ email || "—" }}</p>
         </div>
       </div>
     </div>
@@ -47,11 +47,20 @@
 </template>
 
 <script setup>
-import SignOutIcon from "../../assets/images/SignOutIcon.svg"
+import { computed } from "vue";
+import SignOutIcon from "../../assets/images/SignOutIcon.svg";
 
-defineProps({
+const props = defineProps({
   open: Boolean,
   isCollapsed: Boolean,
+  avatarUrl: { type: String, default: "" },
+  displayName: { type: String, default: "" },
+  email: { type: String, default: "" },
+});
+
+const fallbackAvatar = computed(() => {
+  const seed = (props.displayName || props.email || "User").trim() || "User";
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(seed)}&background=7950F2&color=fff&size=96`;
 });
 
 const emit = defineEmits(["close", "signOut"]);

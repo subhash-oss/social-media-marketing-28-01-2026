@@ -172,10 +172,14 @@
             :class="isCollapsed ? 'justify-center' : ''" @click.stop="showUserAccount = true"
             @mouseenter="hoveredItem = 'account'" @mouseleave="hoveredItem = null"
             :ref="el => { if (el) menuItemRefs['account'] = el }">
-            <img src="https://i.pravatar.cc/40" class="h-8 w-8 rounded-full" />
+            <img
+              :src="sidebarAvatarUrl"
+              :alt="sidebarDisplayName || 'Profile'"
+              class="h-8 w-8 rounded-full object-cover"
+            />
             <div v-if="!isCollapsed">
-              <p class="label_2_semibold primary_text_color">Cliff Booth</p>
-              <p class="label_3_regular secondary_text_color">cliffbooth@gmail.com</p>
+              <p class="label_2_semibold primary_text_color">{{ sidebarDisplayName || "—" }}</p>
+              <p class="label_3_regular secondary_text_color">{{ sidebarUserEmail || "—" }}</p>
             </div>
             <Teleport to="body">
               <div v-if="isCollapsed && hoveredItem === 'account'" :style="getTooltipStyle('account')"
@@ -199,8 +203,15 @@
     <!-- 🔔 NOTIFICATION POPUP -->
     <NotificationPopup :open="showNotifications" :isCollapsed="isCollapsed" @close="showNotifications = false" />
     <!-- 👤 USER ACCOUNT POPUP -->
-    <UserAccountPopup :open="showUserAccount" :isCollapsed="isCollapsed" @close="showUserAccount = false"
-      @signOut="handleSignOut" />
+    <UserAccountPopup
+      :open="showUserAccount"
+      :is-collapsed="isCollapsed"
+      :avatar-url="sidebarAvatarUrl"
+      :display-name="sidebarDisplayName"
+      :email="sidebarUserEmail"
+      @close="showUserAccount = false"
+      @signOut="handleSignOut"
+    />
   </aside>
 
 
@@ -241,6 +252,38 @@
   /* Chat Sessions */
   const chatSessions = ref([]);
   const isLoadingSessions = ref(false);
+
+  const sidebarDisplayName = ref("");
+  const sidebarUserEmail = ref("");
+  const sidebarAvatarUrl = ref(
+    "https://ui-avatars.com/api/?name=User&background=7950F2&color=fff&size=96"
+  );
+
+  function sidebarFallbackAvatar(seed) {
+    const label = (seed && String(seed).trim()) || "User";
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(label)}&background=7950F2&color=fff&size=96`;
+  }
+
+  async function fetchSidebarUser() {
+    try {
+      const { data } = await api.get("/auth/me");
+      const user = data?.data?.user ?? data?.user ?? null;
+      if (!user || typeof user !== "object") return;
+
+      const email = user.email != null ? String(user.email).trim() : "";
+      const fullName = user.fullName != null ? String(user.fullName).trim() : "";
+      const username = user.username != null ? String(user.username).trim() : "";
+      const name = username || fullName;
+
+      sidebarDisplayName.value = name;
+      sidebarUserEmail.value = email;
+
+      const pic = user.profilePictureUrl != null ? String(user.profilePictureUrl).trim() : "";
+      sidebarAvatarUrl.value = pic || sidebarFallbackAvatar(name || email);
+    } catch (e) {
+      console.error("Failed to load user for sidebar:", e);
+    }
+  }
 
   /** Milliseconds for sorting; prefers updated time so active threads rise to the top. */
   const getSessionActivityMs = (s) => {
@@ -376,6 +419,7 @@
   onMounted(() => {
     emit("collapseChange", isCollapsed.value);
     fetchChatSessions();
+    fetchSidebarUser();
   });
   
   // Expose refresh function to parent

@@ -730,7 +730,7 @@
 
     <!-- Prompt Box at Bottom (Fixed; narrows on desktop when post panel is open) -->
     <div 
-      class="fixed bottom-0 left-0 right-0 z-40 transition-all duration-300 ease-in-out bg_primary_color px-4 md:px-6"
+      class="fixed bottom-0 left-0 right-0 z-40 transition-all duration-300 ease-in-out bg_primary_color z-[9] px-4 md:px-6"
       :class="[
         isSidebarCollapsed ? 'lg:left-16' : 'lg:left-64',
         showPostShareModal ? 'lg:right-[30%]' : '',
