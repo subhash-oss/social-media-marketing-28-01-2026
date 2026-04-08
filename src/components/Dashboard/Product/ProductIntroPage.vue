@@ -145,11 +145,8 @@
             </div>
             <div class="min-w-0">
               <p class="label_2_medium secondary_text_color">Typography</p>
-              <p
-                class="mt-2 truncate label_1_medium primary_text_color"
-                :style="{ fontFamily: firstFontFamily(product.brandFonts) }"
-              >
-                {{ firstFontName(product.brandFonts) }}
+              <p class="mt-2 truncate label_1_medium primary_text_color">
+                {{ product.typography || "—" }}
               </p>
             </div>
             <div>
@@ -266,25 +263,6 @@ function parseColors(colors) {
       .filter(Boolean);
   }
   return [];
-}
-
-function firstFontName(fonts) {
-  if (!fonts) return "—";
-  if (Array.isArray(fonts)) {
-    const first = fonts[0];
-    return first != null && String(first).trim() ? String(first).trim() : "—";
-  }
-  if (typeof fonts === "string") {
-    const first = fonts.split(",")[0]?.trim();
-    return first || "—";
-  }
-  return "—";
-}
-
-function firstFontFamily(fonts) {
-  const name = firstFontName(fonts);
-  if (name === "—") return "inherit";
-  return `"${name.replace(/"/g, "")}", sans-serif`;
 }
 
 /** Map API / UI strings to keys used in platformMap (instagram, facebook, …). */

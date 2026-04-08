@@ -35,7 +35,7 @@
 
     <!-- Chat History -->
     <p class="mt-6xl label_3_semibold primary_text_color">Chat history</p>
-    <div class="mt-xl max-h-[200px] overflow-y-auto custom_scrollbar pr-1">
+    <div class="mt-xl max-h-[155px] md:max-h-[200px] overflow-y-auto custom_scrollbar pr-1">
       <!-- Dynamic Chat Sessions from API -->
       <div 
         v-for="session in chatSessions" 
@@ -129,7 +129,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import api from "../../services/api.js";
+import api, { TOKEN_KEY } from "../../services/api.js";
 import PlusIcon from "../../assets/images/PlusIcon.svg";
 import CalenderIcon from "../../assets/images/CalendarIcon.svg";
 import SettingsIcon from "../../assets/images/SettingsIcon.svg";
@@ -221,10 +221,17 @@ defineExpose({
   refreshChatSessions
 });
 
-const handleSignOut = () => {
-  // Handle sign out logic here
-  console.log("Sign out clicked");
-  // You can add router navigation or API call here
+const handleSignOut = async () => {
+  showUserAccount.value = false;
+  emit("close");
+  try {
+    await api.post("/api/logout");
+  } catch (e) {
+    console.error("Logout request failed:", e);
+  } finally {
+    localStorage.removeItem(TOKEN_KEY);
+    window.location.href = "/signin";
+  }
 };
 
 const handleNewChatClick = () => {

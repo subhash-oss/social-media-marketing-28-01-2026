@@ -209,7 +209,7 @@
 <script setup>
   import { ref, onMounted, nextTick } from "vue";
   import { useRouter } from "vue-router";
-  import api from "../../services/api.js";
+  import api, { TOKEN_KEY } from "../../services/api.js";
 
   /* ✅ IMPORT POPUP */
   import NotificationPopup from "../../components/Dashboard/NotificationsView.vue";
@@ -256,10 +256,16 @@
     return Number.isFinite(t) ? t : 0;
   };
 
-  const handleSignOut = () => {
-    // Handle sign out logic here
-    console.log("Sign out clicked");
-    // You can add router navigation or API call here
+  const handleSignOut = async () => {
+    showUserAccount.value = false;
+    try {
+      await api.post("/api/logout");
+    } catch (e) {
+      console.error("Logout request failed:", e);
+    } finally {
+      localStorage.removeItem(TOKEN_KEY);
+      window.location.href = "/signin";
+    }
   };
 
   const handleNewChatClick = () => {
