@@ -5,11 +5,18 @@
               Update your profile, secure your account, and manage connected apps.
             </p>
             <div class="mt-10xl">
+              <p
+                v-if="isUserLoading"
+                class="label_1_regular secondary_text_color"
+              >
+                Loading profile…
+              </p>
+              <template v-else>
               <!-- Profile Picture -->
               <div class="flex items-start gap-6xl">
                 <div class="relative">
                   <div
-                    class="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center"
+                    class="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-25"
                   >
                     <img
                       :src="profilePictureUrl"
@@ -59,19 +66,30 @@
                   </div>
                   <div v-else class="flex gap-xl">
                     <button
+                      type="button"
+                      :disabled="isSavingName"
                       @click="cancelEditing"
-                      class="px-xxl py-xl rounded-lg primary_border_color bg-gray-25 label_1_semibold h-12"
+                      class="px-xxl py-xl rounded-lg primary_border_color bg-gray-25 label_1_semibold h-12 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancel
                     </button>
                     <button
+                      type="button"
+                      :disabled="isSavingName"
                       @click="saveChanges"
-                      class="px-xxl py-xl rounded-lg primary_button h-12"
+                      class="px-xxl py-xl rounded-lg primary_button h-12 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Save
+                      {{ isSavingName ? "Saving…" : "Save" }}
                     </button>
                   </div>
               </div>
+              <p
+                v-if="nameSaveError"
+                class="label_2_semibold text-error-600 mt-sm"
+                role="alert"
+              >
+                {{ nameSaveError }}
+              </p>
               </div> 
 
               <!-- Email Field -->
@@ -121,6 +139,7 @@
                   </div>
                 </div>
               </div>
+              </template>
             </div>
 
             
@@ -143,7 +162,7 @@
                   </div>
                   <div>
                     <p class="label_1_medium primary_text_color">Google</p>
-                    <p class="label_1_bold primary_text_color">Charlene Reed</p>
+                    <p class="label_1_bold primary_text_color">{{ profileForm.name || "—" }}</p>
                   </div>
                 </div>
                 <button
@@ -172,14 +191,20 @@
       <div class="p-6xl border-b border-gray-25">
         <h2 class="heading_h5_bold heading_h5_bold">Edit Profile Picture</h2>
         <p class="label_1_regular secondary_text_color mt-xl">
-          {{ uploadedImage ? 'Crop and adjust your image' : 'Upload a new image and crop it to your preference' }}
+          {{
+            showUploadPanel
+              ? 'Upload a new image and crop it to your preference'
+              : uploadedImage
+                ? 'Crop and adjust your new image'
+                : 'Crop and adjust your current photo'
+          }}
         </p>
       </div>
 
       <!-- Modal Content -->
       <div class="p-6">
         <!-- File Upload Section -->
-        <div v-if="!uploadedImage" class="space-y-4">
+        <div v-if="showUploadPanel" class="space-y-4">
           <div
             @drop="handleDrop"
             @dragover.prevent
@@ -249,13 +274,14 @@
           />
         </div>
 
-        <!-- Image Cropper Section -->
-        <div v-else class="space-y-4">
-          <div class="relative w-full h-[400px] bg-info-50rounded-lg overflow-hidden">
+        <!-- Image Cropper Section: current profile photo or newly uploaded image -->
+        <div v-else-if="cropperSrc" class="space-y-4">
+          <div class="relative w-full h-[400px] bg-info-50 rounded-lg overflow-hidden">
             <Cropper
               ref="cropperRef"
               class="cropper"
-              :src="uploadedImage"
+              :key="cropperSrc"
+              :src="cropperSrc"
               :stencil-props="{
                 aspectRatio: 1,
                 movable: true,
@@ -294,7 +320,8 @@
           Cancel
         </button>
         <button
-          v-if="uploadedImage"
+          v-if="!showUploadPanel && cropperSrc"
+          type="button"
           @click="saveProfilePicture"
           class="px-4 py-2 rounded-md bg-black-400 text-white label_2_semibold hover:bg-black-700 transition-colors"
         >
@@ -327,7 +354,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, h } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
+import api from "../../../services/api.js";
 import { Cropper } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
 import EmailVerificationModal from "./EmailVerificationModal.vue";
@@ -337,22 +365,63 @@ import InputboxEditIcon from "../../../assets/images/InputboxEditIcon.svg";
 import GoogleIcon from "../../../assets/images/GoogleIcon.svg";
 import WarningGrayIcon from "../../../assets/images/WarningGrayIcon.svg";
 
-// Profile form state
+// Profile form state (name = API `username`)
 const profileForm = reactive({
-  name: "Cliff Booth",
-  email: "cliff Booth@iboson.io",
+  name: "",
+  email: "",
 });
 
 // Original values for cancel functionality
 const originalValues = reactive({
-  name: "Cliff Booth",
-  email: "cliff Booth@iboson.io",
+  name: "",
+  email: "",
+});
+
+const isUserLoading = ref(true);
+
+function buildFallbackAvatar(seed) {
+  const label = (seed && String(seed).trim()) || "User";
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(label)}&background=7950F2&color=fff&size=96`;
+}
+
+async function fetchUserProfile() {
+  isUserLoading.value = true;
+  try {
+    const { data } = await api.get("/auth/me");
+    const user = data?.data?.user ?? data?.user ?? null;
+    if (!user || typeof user !== "object") return;
+
+    const username = user.username != null ? String(user.username).trim() : "";
+    const email = user.email != null ? String(user.email).trim() : "";
+
+    profileForm.name = username;
+    profileForm.email = email;
+    originalValues.name = username;
+    originalValues.email = email;
+
+    const fallback = buildFallbackAvatar(username || email);
+    defaultAvatarUrl.value = fallback;
+    const pic = user.profilePictureUrl != null ? String(user.profilePictureUrl).trim() : "";
+    profilePictureUrl.value = pic || fallback;
+
+    googleAccountEmail.value = email;
+  } catch (e) {
+    console.error("Failed to load user profile:", e);
+  } finally {
+    isUserLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  fetchUserProfile();
 });
 
 // Edit states
 const isEditing = ref(false);
 const isEditingEmail = ref(false);
 const editProfilePicture = ref(false);
+const isSavingName = ref(false);
+const nameSaveError = ref("");
 
 // Email verification state
 const showEmailVerificationModal = ref(false);
@@ -363,33 +432,96 @@ const verificationDescription = ref("");
 
 // Disconnect account modal state
 const showDisconnectModal = ref(false);
-const googleAccountEmail = ref("cliffbooth@gmail.com"); // This should come from your auth provider
+const googleAccountEmail = ref("");
 const disconnectDescription = ref("");
 
 // Profile picture state
-const defaultAvatarUrl = "https://ui-avatars.com/api/?name=Cliff+Booth&background=7950F2&color=fff&size=96";
-const profilePictureUrl = ref(defaultAvatarUrl);
+const defaultAvatarUrl = ref(buildFallbackAvatar("User"));
+const profilePictureUrl = ref(defaultAvatarUrl.value);
 const uploadedImage = ref(null);
 const fileInputRef = ref(null);
 const cropperRef = ref(null);
 const isDragOver = ref(false);
 const isExistingImage = ref(false);
+/** When true, show file picker instead of cropper (e.g. after "Choose Different Image"). */
+const forceUploadPanel = ref(false);
+
+const showUploadPanel = computed(() => {
+  if (forceUploadPanel.value) return true;
+  return !uploadedImage.value && !profilePictureUrl.value;
+});
+
+/** Cropper source: new upload takes precedence over saved profile picture URL. */
+const cropperSrc = computed(() => uploadedImage.value || profilePictureUrl.value || "");
+
+function extractProfileUpdateError(e) {
+  const d = e?.response?.data;
+  if (d == null) {
+    return e?.message || "Something went wrong. Please try again.";
+  }
+  if (typeof d === "string") return d;
+  if (d.message != null) {
+    const m = d.message;
+    return Array.isArray(m) ? m.join(", ") : String(m);
+  }
+  if (d.error != null) {
+    return typeof d.error === "string" ? d.error : JSON.stringify(d.error);
+  }
+  if (Array.isArray(d.errors)) {
+    const parts = d.errors.map((x) =>
+      typeof x === "string" ? x : x?.message || x?.msg || String(x)
+    );
+    const msg = parts.filter(Boolean).join(" ");
+    if (msg) return msg;
+  }
+  if (d.errors && typeof d.errors === "object" && !Array.isArray(d.errors)) {
+    const parts = Object.entries(d.errors).flatMap(([k, v]) =>
+      Array.isArray(v) ? v.map((item) => `${k}: ${item}`) : [`${k}: ${v}`]
+    );
+    if (parts.length) return parts.join(" ");
+  }
+  return "Could not update username.";
+}
 
 // Edit functions
 const startEditing = () => {
+  nameSaveError.value = "";
   isEditing.value = true;
   originalValues.name = profileForm.name;
 };
 
 const cancelEditing = () => {
+  nameSaveError.value = "";
   isEditing.value = false;
   profileForm.name = originalValues.name;
 };
 
-const saveChanges = () => {
-  isEditing.value = false;
-  originalValues.name = profileForm.name;
-  // Here you would typically make an API call to save the changes
+const saveChanges = async () => {
+  nameSaveError.value = "";
+  const username = String(profileForm.name ?? "").trim();
+  if (!username) {
+    nameSaveError.value = "Username is required.";
+    return;
+  }
+  if (username === String(originalValues.name ?? "").trim()) {
+    isEditing.value = false;
+    return;
+  }
+  isSavingName.value = true;
+  try {
+    await api.put("/auth/profile", { username });
+    originalValues.name = username;
+    profileForm.name = username;
+    isEditing.value = false;
+    defaultAvatarUrl.value = buildFallbackAvatar(username);
+    if (String(profilePictureUrl.value).includes("ui-avatars.com")) {
+      profilePictureUrl.value = defaultAvatarUrl.value;
+    }
+  } catch (e) {
+    nameSaveError.value = extractProfileUpdateError(e);
+  } finally {
+    isSavingName.value = false;
+  }
 };
 
 const startEditingEmail = () => {
@@ -500,64 +632,41 @@ const processImageFile = (file) => {
   const reader = new FileReader();
   reader.onload = (e) => {
     uploadedImage.value = e.target.result;
-    isExistingImage.value = false; // This is a new upload
+    isExistingImage.value = false;
+    forceUploadPanel.value = false;
   };
   reader.readAsDataURL(file);
 };
 
 const openProfilePictureEditor = () => {
   editProfilePicture.value = true;
-  // If there's an existing uploaded image (not the default avatar), load it for editing
-  if (profilePictureUrl.value && profilePictureUrl.value !== defaultAvatarUrl) {
-    // Check if it's a blob URL (from previous upload) or a regular image URL
-    if (profilePictureUrl.value.startsWith('blob:') || (!profilePictureUrl.value.startsWith('http') && !profilePictureUrl.value.startsWith('data:'))) {
-      // It's a blob URL or local file URL from a previous upload, load it for editing
-      loadExistingImageForEditing();
-    } else if (profilePictureUrl.value.startsWith('data:')) {
-      // It's already a data URL, use it directly
-      uploadedImage.value = profilePictureUrl.value;
-      isExistingImage.value = true;
-    } else {
-      // It's an external URL (like the default avatar), try to load it for editing
-      loadExistingImageForEditing();
-    }
-  }
-};
-
-const loadExistingImageForEditing = async () => {
-  try {
-    // Convert blob URL to data URL for the cropper
-    const response = await fetch(profilePictureUrl.value);
-    const blob = await response.blob();
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      uploadedImage.value = e.target.result;
-      isExistingImage.value = true;
-    };
-    reader.readAsDataURL(blob);
-  } catch (error) {
-    console.error('Error loading existing image:', error);
-    // If there's an error, allow user to upload a new image
-    uploadedImage.value = null;
-    isExistingImage.value = false;
-  }
+  forceUploadPanel.value = false;
+  uploadedImage.value = null;
+  isExistingImage.value =
+    Boolean(profilePictureUrl.value) &&
+    String(profilePictureUrl.value) !== String(defaultAvatarUrl.value);
 };
 
 const resetImage = () => {
   uploadedImage.value = null;
   isExistingImage.value = false;
+  forceUploadPanel.value = true;
   if (fileInputRef.value) {
     fileInputRef.value.value = "";
   }
 };
 
 const removeExistingImage = () => {
-  // Reset to default avatar
-  if (profilePictureUrl.value && profilePictureUrl.value.startsWith('blob:')) {
+  if (profilePictureUrl.value && profilePictureUrl.value.startsWith("blob:")) {
     URL.revokeObjectURL(profilePictureUrl.value);
   }
-  profilePictureUrl.value = defaultAvatarUrl;
-  resetImage();
+  profilePictureUrl.value = defaultAvatarUrl.value;
+  uploadedImage.value = null;
+  forceUploadPanel.value = false;
+  isExistingImage.value = false;
+  if (fileInputRef.value) {
+    fileInputRef.value.value = "";
+  }
   closeProfilePictureModal();
 };
 
