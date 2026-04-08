@@ -54,6 +54,7 @@
 
       <!-- Step 2: Brand Identity -->
       <BrandIdentity
+        ref="brandIdentityRef"
         v-if="currentStep === 2"
         v-model:active-tab="activeTab"
         v-model:product-name="productName"
@@ -126,6 +127,7 @@ const productName = ref("Lumo Vibe");
 const description = ref("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.");
 const isStep1Valid = ref(false);
 const showSuccessModal = ref(false);
+const brandIdentityRef = ref(null);
 
 // Refs for step navigation scrolling
 const scrollContainer = ref(null);
@@ -183,11 +185,14 @@ const handleContinue = () => {
     return;
   }
   
-  // Always move to next step when Continue is clicked
+  const identity = brandIdentityRef.value?.getBrandIdentitySelections?.() ?? {};
+
   emit("continue", {
     websiteUrl: websiteUrl.value,
     productName: productName.value,
     description: description.value,
+    brandColors: identity.brandColors,
+    brandVoice: identity.brandVoice,
     moveToNextStep: true,
   });
 };

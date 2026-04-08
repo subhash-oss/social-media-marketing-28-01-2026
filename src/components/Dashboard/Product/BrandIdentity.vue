@@ -82,7 +82,7 @@
 
     <!-- Placeholder for other tabs -->
      <div v-else-if="activeTab === 'brand-colors'" class="h-full">
-      <BrandColor/>
+      <BrandColor v-model:colors="brandColors" />
     </div>
    <!-- tab for typography -->
     <div v-else-if="activeTab === 'typography'" class="h-full">
@@ -90,7 +90,7 @@
     </div>
     <!-- tab for typography -->
     <div v-else-if="activeTab === 'tone-style'" class="h-full">
-      <BrandStyle/>
+      <BrandStyle v-model:brand-voice="brandVoice" />
     </div>
 
     <div v-else>
@@ -101,10 +101,27 @@
 </template>
 
 <script setup>
+import { reactive, ref } from "vue";
 import BrandInfoFields from "../product/BrandInfo/BrandInfoFields.vue";
 import BrandColor from "../product/BrandInfo/BrandColor.vue";
 import BrandTypography from "../product/BrandInfo/BrandTypography.vue"
 import BrandStyle from "../product/BrandInfo/BrandStyle.vue"
+
+const brandColors = reactive({
+  primary: "#2684FF",
+  secondary: "#8CB9FF",
+  font: "#5A6772",
+});
+const brandVoice = ref("friendly");
+
+defineExpose({
+  getBrandIdentitySelections() {
+    return {
+      brandColors: { ...brandColors },
+      brandVoice: brandVoice.value,
+    };
+  },
+});
 
 defineProps({
   activeTab: {

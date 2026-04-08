@@ -7,10 +7,10 @@
     <ul class="grid grid-cols-2 gap-6xl w-[100%]">
       <!-- Friendly -->
       <li
-        @click="selectedVoice = 'friendly'"
+        @click="brandVoice = 'friendly'"
         class="relative flex flex-col  items-start rounded-xl cursor-pointer p-4xl"
         :class="
-          selectedVoice === 'friendly'
+          brandVoice === 'friendly'
             ? 'gradient-border bg_primary_color'
             : 'default-border'
         "
@@ -29,10 +29,10 @@
 
       <!-- Professional -->
       <li
-        @click="selectedVoice = 'professional'"
+        @click="brandVoice = 'professional'"
         class="relative flex flex-col items-start justify-center rounded-xl p-4xl cursor-pointer transition-all"
         :class="
-          selectedVoice === 'professional'
+          brandVoice === 'professional'
             ? 'gradient-border bg_primary_color'
             : 'default-border'
         "
@@ -50,10 +50,10 @@
 
       <!-- Playful -->
       <li
-        @click="selectedVoice = 'playful'"
+        @click="brandVoice = 'playful'"
         class="relative flex flex-col  items-start rounded-xl cursor-pointer transition-all p-4xl"
         :class="
-          selectedVoice === 'playful'
+          brandVoice === 'playful'
             ? 'gradient-border bg_primary_color'
             : 'default-border'
         "
@@ -71,10 +71,10 @@
 
       <!-- Calm -->
       <li
-        @click="selectedVoice = 'calm'"
+        @click="brandVoice = 'calm'"
         class="relative flex flex-col  items-start rounded-xl cursor-pointer transition-all p-4xl"
         :class="
-          selectedVoice === 'calm'
+          brandVoice === 'calm'
             ? 'gradient-border bg_primary_color'
             : 'default-border'
         "
@@ -96,9 +96,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-
-const selectedVoice = ref('friendly');
+const brandVoice = defineModel("brandVoice", {
+  type: String,
+  default: "friendly",
+});
 </script>
 
 <style scoped>

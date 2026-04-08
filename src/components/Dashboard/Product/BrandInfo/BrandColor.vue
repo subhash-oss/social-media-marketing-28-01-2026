@@ -68,11 +68,12 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
-
-const colors = reactive({
-  primary: '#2684FF',
-  secondary: '#8CB9FF',
-  font: '#5A6772',
+const colors = defineModel("colors", {
+  type: Object,
+  default: () => ({
+    primary: "#2684FF",
+    secondary: "#8CB9FF",
+    font: "#5A6772",
+  }),
 });
 </script>

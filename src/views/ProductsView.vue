@@ -30,7 +30,14 @@ const handleBack = () => {
 };
 
 const handleContinue = (data) => {
-    console.log("Form data:", data);
+    console.log("Form data:", {
+        websiteUrl: data?.websiteUrl,
+        productName: data?.productName,
+        description: data?.description,
+        brandColors: data?.brandColors,
+        brandVoice: data?.brandVoice,
+        moveToNextStep: data?.moveToNextStep,
+    });
     
     // If moving to next main step (step 1 -> step 2, or step 2 -> step 3)
     if (data && data.moveToNextStep && currentStep.value < 3) {
