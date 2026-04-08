@@ -119,8 +119,9 @@
                 <div class="h-px w-full bg-gray-25" aria-hidden="true" />
                 <button
                   type="button"
-                  class="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left label_2_medium primary_text_color transition-colors hover:bg-gray-25"
-                  @click="closeMenu"
+                  class="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left label_2_medium primary_text_color transition-colors hover:bg-gray-25 disabled:opacity-50"
+                  :disabled="deletingProductId === product.id"
+                  @click.stop="handleDeleteProduct(product)"
                 >
                   <span>Delete</span>
                   <img :src="TrashIcon" alt="" class="h-4 w-4 shrink-0 opacity-80" />
@@ -232,6 +233,7 @@ const products = ref([]);
 const isLoading = ref(true);
 const searchQuery = ref("");
 const openMenuId = ref(null);
+const deletingProductId = ref(null);
 /** Local toggle state keyed by product id; falls back to API `isActive` when unset. */
 const activeOverrides = ref({});
 
@@ -389,6 +391,28 @@ function toggleMenu(id) {
 
 function closeMenu() {
   openMenuId.value = null;
+}
+
+/** DELETE /api/products/:id */
+async function handleDeleteProduct(product) {
+  const id = product?.id;
+  if (!id || deletingProductId.value) return;
+  closeMenu();
+  deletingProductId.value = id;
+  try {
+    await api.delete(`/api/products/${encodeURIComponent(id)}`);
+    products.value = products.value.filter((p) => p.id !== id);
+    const nextOverrides = { ...activeOverrides.value };
+    delete nextOverrides[id];
+    activeOverrides.value = nextOverrides;
+  } catch (e) {
+    console.error("Delete product failed:", e);
+    window.alert(
+      e?.response?.data?.message || e?.message || "Could not delete product"
+    );
+  } finally {
+    deletingProductId.value = null;
+  }
 }
 
 function onDocClick(e) {

@@ -31,9 +31,14 @@
             <img :src="ProductIcon" alt="" class="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none lg:hidden">
             <select v-model="selectedProduct"
               class="flex items-center w-full gap-md rounded-lg regular_border_color pl-10xl pr-10xl md:pl-10xl md:pr-12xl py-md label_2_medium primary_text_color bg_secondary_color appearance-none">
-              <option value="single">Single</option>
-              <option value="multi">Multi</option>
               <option value="all">All products</option>
+              <option
+                v-for="product in calendarProducts"
+                :key="product.id"
+                :value="product.id"
+                :data-product-id="product.id">
+                {{ product.name }}
+              </option>
             </select>
             <img :src="DownArrow" alt=""
               class="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -43,9 +48,13 @@
             <img :src="AllPlatformsIcon" alt="" class="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none lg:hidden">
             <select v-model="selectedPlatform"
               class="flex items-center w-full gap-md rounded-lg regular_border_color pl-10xl pr-10xl md:pl-10xl md:pr-12xl py-md label_2_medium primary_text_color bg_secondary_color appearance-none">
-              <option value="single">Single</option>
-              <option value="multi">Multi</option>
               <option value="all">All platforms</option>
+              <option
+                v-for="platform in calendarPlatforms"
+                :key="platform.name"
+                :value="platform.name">
+                {{ platform.name }}
+              </option>
             </select>
             <img :src="DownArrow" alt=""
               class="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -815,6 +824,7 @@
   import TikTokIcon from "../assets/images/TikTokIcon.svg"
   import YoutubeIcon from "../assets/images/YoutubeIcon.svg"
   import AllPlatformsIcon from "../assets/images/AllPlatformsIcon.svg"
+  import api from "../services/api.js"
   const selectedTime = ref(null);
   const selectedDate = ref(null);
   const selectedPost = ref(null); // Selected post for detail view
@@ -841,7 +851,45 @@
     windowWidth.value = window.innerWidth;
   };
 
+  const calendarProducts = ref([]);
+
+  const fetchCalendarProducts = async () => {
+    try {
+      const response = await api.get("/api/products");
+      let list = [];
+      if (Array.isArray(response.data)) {
+        list = response.data;
+      } else if (response.data?.products && Array.isArray(response.data.products)) {
+        list = response.data.products;
+      }
+      calendarProducts.value = list;
+    } catch (e) {
+      console.error("Error fetching products:", e);
+      calendarProducts.value = [];
+    }
+  };
+
+  const calendarPlatforms = ref([]);
+
+  const fetchCalendarPlatforms = async () => {
+    try {
+      const response = await api.get("/api/platforms");
+      let list = [];
+      if (Array.isArray(response.data)) {
+        list = response.data;
+      } else if (response.data?.platforms && Array.isArray(response.data.platforms)) {
+        list = response.data.platforms;
+      }
+      calendarPlatforms.value = list;
+    } catch (e) {
+      console.error("Error fetching platforms:", e);
+      calendarPlatforms.value = [];
+    }
+  };
+
   onMounted(() => {
+    fetchCalendarProducts();
+    fetchCalendarPlatforms();
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', handleResize);
       // Use document for better mobile support
@@ -867,7 +915,7 @@
   const scheduledPosts = ref([
     {
       id: 1,
-      postDate: "2026-02-01",
+      postDate: "2026-04-01",
       postTime: "09:00",
       platforms: ["instagram", "facebook"],
       postImage: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop",
@@ -878,7 +926,7 @@
     },
     {
       id: 2,
-      postDate: "2026-02-28",
+      postDate: "2026-04-28",
       postTime: "10:30",
       platforms: ["instagram", "linkedin", "facebook"],
       postImage: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop",
@@ -889,7 +937,7 @@
     },
     {
       id: 3,
-      postDate: "2026-02-15",
+      postDate: "2026-04-15",
       postTime: "10:00",
       platforms: ["instagram", "facebook", "twitter", "linkedin"],
       postImage: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
@@ -900,7 +948,7 @@
     },
     {
       id: 4,
-      postDate: "2026-02-26",
+      postDate: "2026-04-26",
       postTime: "14:00",
       platforms: ["instagram", "twitter"],
       postImage: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=200&h=200&fit=crop",
