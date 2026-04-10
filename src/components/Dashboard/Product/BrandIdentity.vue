@@ -86,7 +86,7 @@
     </div>
    <!-- tab for typography -->
     <div v-else-if="activeTab === 'typography'" class="h-full">
-      <BrandTypography/>
+      <BrandTypography v-model:typography="typography" />
     </div>
     <!-- tab for typography -->
     <div v-else-if="activeTab === 'tone-style'" class="h-full">
@@ -101,29 +101,23 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted, watch } from "vue";
 import BrandInfoFields from "../product/BrandInfo/BrandInfoFields.vue";
 import BrandColor from "../product/BrandInfo/BrandColor.vue";
 import BrandTypography from "../product/BrandInfo/BrandTypography.vue"
 import BrandStyle from "../product/BrandInfo/BrandStyle.vue"
 
-const brandColors = reactive({
+const DEFAULT_COLORS = {
   primary: "#2684FF",
   secondary: "#8CB9FF",
   font: "#5A6772",
-});
+};
+
+const brandColors = reactive({ ...DEFAULT_COLORS });
 const brandVoice = ref("friendly");
+const typography = ref("Open Sans");
 
-defineExpose({
-  getBrandIdentitySelections() {
-    return {
-      brandColors: { ...brandColors },
-      brandVoice: brandVoice.value,
-    };
-  },
-});
-
-defineProps({
+const props = defineProps({
   activeTab: {
     type: String,
     default: "product-info",
@@ -136,8 +130,57 @@ defineProps({
     type: String,
     default: "",
   },
+  /** When set (e.g. product edit), merge into brand state — use with :key on parent to re-init per product */
+  initialBrandColors: {
+    type: Object,
+    default: null,
+  },
+  initialBrandVoice: {
+    type: String,
+    default: null,
+  },
+  initialTypography: {
+    type: String,
+    default: null,
+  },
 });
 
-defineEmits(["update:activeTab", "update:productName", "update:description"]);
+function applyInitialBrandState() {
+  if (props.initialBrandColors && typeof props.initialBrandColors === "object") {
+    Object.assign(brandColors, DEFAULT_COLORS, props.initialBrandColors);
+  }
+  if (props.initialBrandVoice != null && props.initialBrandVoice !== "") {
+    brandVoice.value = props.initialBrandVoice;
+  }
+  if (props.initialTypography != null && props.initialTypography !== "") {
+    typography.value = props.initialTypography;
+  }
+}
+
+onMounted(() => {
+  applyInitialBrandState();
+});
+
+const emit = defineEmits([
+  "update:activeTab",
+  "update:productName",
+  "update:description",
+  "field-change",
+]);
+
+watch(brandColors, () => emit("field-change"), { deep: true, flush: "post" });
+watch(brandVoice, () => emit("field-change"), { flush: "post" });
+watch(typography, () => emit("field-change"), { flush: "post" });
+
+defineExpose({
+  getBrandIdentitySelections() {
+    return {
+      brandColors: { ...brandColors },
+      brandVoice: brandVoice.value,
+      typography: typography.value,
+    };
+  },
+});
+
 </script>
 

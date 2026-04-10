@@ -7,7 +7,7 @@
       </label>
       <div class="w-[100%] md:w-[70%]">
         <input
-          :model-value="productName"
+          :value="productName"
           @input="$emit('update:productName', $event.target.value)"
           type="text"
           placeholder="Enter product name"
@@ -23,7 +23,7 @@
       </label>
       <div class="w-[100%] md:w-[70%]">
         <textarea
-          :model-value="description"
+          :value="description"
           @input="$emit('update:description', $event.target.value)"
           placeholder="description...."
           class="input_box w-full min-h-[100px] resize-y border border-gray-400 py-xl px-3xl mt-sm md:mt-0"

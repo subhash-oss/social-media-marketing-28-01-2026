@@ -1,10 +1,23 @@
 <template>
-    <ProductIntroPage v-if="!showCreateForm" @add-product="handleAddProduct" />
+    <ProductIntroPage
+        v-if="view === 'list'"
+        ref="introPageRef"
+        @add-product="handleAddProduct"
+        @select-product="handleSelectProduct"
+    />
     <ProductInfoForm
-        v-else
+        v-else-if="view === 'create'"
         :current-step="currentStep"
         @back="handleBack"
         @continue="handleContinue"
+        @close="handleCreateFlowClose"
+    />
+    <ProductEditPage
+        v-else-if="view === 'edit' && editingProduct"
+        :product="editingProduct"
+        @back="handleCloseEdit"
+        @saved="handleEditSaved"
+        @deleted="handleEditDeleted"
     />
 </template>
 
@@ -12,18 +25,42 @@
 import { ref } from "vue";
 import ProductIntroPage from "../components/Dashboard/Product/ProductIntroPage.vue";
 import ProductInfoForm from "../components/Dashboard/Product/ProductInfoForm.vue";
+import ProductEditPage from "../components/Dashboard/Product/ProductEditPage.vue";
 
-const showCreateForm = ref(false);
+const view = ref("list"); // 'list' | 'create' | 'edit'
 const currentStep = ref(1);
+const editingProduct = ref(null);
+const introPageRef = ref(null);
 
 const handleAddProduct = () => {
-    showCreateForm.value = true;
+    view.value = "create";
     currentStep.value = 1;
+};
+
+const handleSelectProduct = (product) => {
+    if (!product?.id) return;
+    editingProduct.value = product;
+    view.value = "edit";
+};
+
+const handleCloseEdit = () => {
+    editingProduct.value = null;
+    view.value = "list";
+};
+
+const handleEditSaved = () => {
+    introPageRef.value?.fetchProducts?.();
+    handleCloseEdit();
+};
+
+const handleEditDeleted = () => {
+    introPageRef.value?.fetchProducts?.();
+    handleCloseEdit();
 };
 
 const handleBack = () => {
     if (currentStep.value === 1) {
-        showCreateForm.value = false;
+        view.value = "list";
     } else {
         currentStep.value--;
     }
@@ -36,17 +73,17 @@ const handleContinue = (data) => {
         description: data?.description,
         brandColors: data?.brandColors,
         brandVoice: data?.brandVoice,
+        typography: data?.typography,
         moveToNextStep: data?.moveToNextStep,
     });
-    
-    // If moving to next main step (step 1 -> step 2, or step 2 -> step 3)
+
     if (data && data.moveToNextStep && currentStep.value < 3) {
         currentStep.value++;
-    } else if (currentStep.value === 3 && data && data.moveToNextStep) {
-        // Final step - submit form
-        console.log("Submit form with data:", data);
-        // You can add submission logic here
     }
 };
-</script>
 
+const handleCreateFlowClose = () => {
+    view.value = "list";
+    introPageRef.value?.fetchProducts?.();
+};
+</script>

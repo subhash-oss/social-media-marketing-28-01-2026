@@ -245,19 +245,13 @@
                     v-for="(platform, pIdx) in message.typeData.platforms"
                     :key="platform.name || pIdx"
                     type="button"
-                    class="flex w-full min-w-0 items-center gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors"
-                    :class="
-                      platform.connected
-                        ? 'cursor-not-allowed opacity-50'
-                        : 'cursor-pointer hover:bg-[#F9FAFB]'
-                    "
-                    :disabled="Boolean(platform.connected)"
+                    class="flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors hover:bg-[#F9FAFB]"
                     :aria-label="
                       platform.connected
-                        ? `${platform.label} — connected`
+                        ? `Disconnect ${platform.label}`
                         : `Connect ${platform.label}`
                     "
-                    @click="goToSocialPlatformAuth(platform.authUrl, platform.name)"
+                    @click="handleSocialPlatformCardAction(platform, index)"
                   >
                     <img
                       :src="platform.icon"
@@ -288,19 +282,19 @@
                     </span>
                     <span
                       v-else
-                      class="flex h-8 w-8 shrink-0 items-center justify-center text-emerald-600"
+                      class="group relative flex h-8 w-8 shrink-0 items-center justify-center text-[#1D2125]"
                       aria-hidden="true"
                     >
                       <svg
-                        class="h-5 w-5"
+                        class="disconnect-icon-chat h-6 w-6"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          d="M20 6L9 17l-5-5"
+                          d="M17 22V20M9 15L15 9M11 6.00031L11.463 5.46431C12.4008 4.52663 13.6727 3.99991 14.9989 4C16.325 4.00009 17.5968 4.527 18.5345 5.46481C19.4722 6.40261 19.9989 7.6745 19.9988 9.00066C19.9987 10.3268 19.4718 11.5986 18.534 12.5363L18 13.0003M13.0001 18L12.6031 18.534C11.6544 19.4722 10.3739 19.9984 9.03964 19.9984C7.70535 19.9984 6.42489 19.4722 5.47614 18.534C5.0085 18.0716 4.63724 17.521 4.38385 16.9141C4.13047 16.3073 4 15.6561 4 14.9985C4 14.3408 4.13047 13.6897 4.38385 13.0829C4.63724 12.476 5.0085 11.9254 5.47614 11.463L6.00014 11M20 17H22M2 7H4M7 2V4"
                           stroke="currentColor"
-                          stroke-width="2"
+                          stroke-width="1.5"
                           stroke-linecap="round"
                           stroke-linejoin="round"
                         />
@@ -1315,12 +1309,49 @@ const showPostMarketingCaption = (message) => {
 
 const isInternalPath = (url) => typeof url === "string" && url.startsWith("/") && !url.startsWith("//");
 
+/** Same slug rules as `SocialConnections.vue` `normalizePlatformKey` — API `name` is source of truth. */
+const normalizeSocialPlatformKey = (raw) => {
+  if (raw == null || raw === "") return null;
+  let s = String(raw).trim().toLowerCase();
+  if (!s) return null;
+  s = s.replace(/\s+/g, "_");
+  s = s.replace(/[^a-z0-9_-]/g, "");
+  s = s.replace(/_+/g, "_").replace(/^_|_$/g, "");
+  return s || null;
+};
+
+function setChatMessagePlatformConnected(messageIndex, platformName, connected) {
+  const msg = messages.value[messageIndex];
+  if (!msg?.typeData?.platforms?.length) return;
+  const key = normalizeSocialPlatformKey(platformName);
+  if (!key) return;
+  const platforms = msg.typeData.platforms.map((p) => {
+    const pk = normalizeSocialPlatformKey(p?.name);
+    if (pk && pk === key) return { ...p, connected };
+    return p;
+  });
+  messages.value[messageIndex] = {
+    ...msg,
+    typeData: { ...msg.typeData, platforms },
+  };
+}
+
+const handleSocialPlatformCardAction = (platform, messageIndex) => {
+  if (platform.connected) {
+    setChatMessagePlatformConnected(messageIndex, platform.name, false);
+    emit("socialAuthLinked", { platform: platform.name, action: "disconnect" });
+    return;
+  }
+  goToSocialPlatformAuth(platform.authUrl, platform.name, messageIndex);
+};
+
 /**
  * Opens OAuth in a popup; appends `token` from localStorage (TOKEN_KEY).
  * Relative `authUrl` is resolved with axios `baseURL` from `src/services/api.js`.
  * Polls until the popup closes or the callback URL indicates success (e.g. `linked=` in query).
+ * @param {number|null} chatMessageIndex — when set, marks that message’s platform row connected on success.
  */
-const goToSocialPlatformAuth = (authUrl, platformName = "") => {
+const goToSocialPlatformAuth = (authUrl, platformName = "", chatMessageIndex = null) => {
   if (!authUrl || typeof authUrl !== "string") return;
 
   const token = localStorage.getItem(TOKEN_KEY);
@@ -1391,7 +1422,14 @@ const goToSocialPlatformAuth = (authUrl, platformName = "") => {
         } catch {
           /* ignore */
         }
-        emit("socialAuthLinked", { platform: platformName, href });
+        emit("socialAuthLinked", { platform: platformName, href, action: "connect" });
+        if (
+          chatMessageIndex != null &&
+          chatMessageIndex >= 0 &&
+          chatMessageIndex < messages.value.length
+        ) {
+          setChatMessagePlatformConnected(chatMessageIndex, platformName, true);
+        }
       }
     } catch {
       /* cross-origin while on provider — expected */
@@ -2018,5 +2056,10 @@ defineExpose({
   60%, 100% {
     content: '...';
   }
+}
+
+button:hover .disconnect-icon-chat path {
+  stroke: #e3665d;
+  transition: stroke 0.2s ease-in-out;
 }
 </style>

@@ -75,39 +75,46 @@
         @view-product="handleViewProduct"
         @go-to-chat="handleGoToChat"
       />
-      <div class="flex items-center justify-between bg_secondary_color mt-5xl px-6xl py-xl primary_border_color rounded-lg">
-        <button
-          @click="handleBack"
-          class="label_1_semibold primary_text_color bg_primary_color primary_border_color px-5xl py-xl rounded-lg"
-        >
-          Back
-        </button>
-        <button
-          @click="handleContinue"
-          :disabled="currentStep === 1 && !isStep1Valid"
-          :class="[
-            'flex items-center gap-md rounded-lg px-5xl py-xl',
-            currentStep === 1 && !isStep1Valid 
-              ? 'modal_disabled_primary_button cursor-not-allowed label_1_semibold' 
-              : 'modal_primary_button cursor-pointer'
-          ]"
-        >
-          <span>{{ currentStep === 3 ? 'Proceed' : 'Continue' }}</span>
-          <img :src="DoneArrowRight" alt="">
-        </button>
+      <div class="bg_secondary_color mt-5xl px-6xl py-xl primary_border_color rounded-lg">
+        <p v-if="submitError" class="mb-xl label_2_regular text-error-600">
+          {{ submitError }}
+        </p>
+        <div class="flex items-center justify-between">
+          <button
+            @click="handleBack"
+            :disabled="isSubmitting"
+            class="label_1_semibold primary_text_color bg_primary_color primary_border_color px-5xl py-xl rounded-lg disabled:opacity-50"
+          >
+            Back
+          </button>
+          <button
+            @click="handleContinue"
+            :disabled="continueDisabled"
+            :class="[
+              'flex items-center gap-md rounded-lg px-5xl py-xl',
+              continueDisabled
+                ? 'modal_disabled_primary_button cursor-not-allowed label_1_semibold'
+                : 'modal_primary_button cursor-pointer'
+            ]"
+          >
+            <span>{{ proceedButtonLabel }}</span>
+            <img v-if="!isSubmitting" :src="DoneArrowRight" alt="">
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from "vue";
+import { ref, watch, nextTick, computed } from "vue";
 import { useRouter } from "vue-router";
 import BrandInfo from "./BrandInfo.vue";
 import BrandIdentity from "./BrandIdentity.vue";
 import SocialConnections from "./SocialConnections.vue";
 import BrandCreatedSuccessModal from "./BrandCreatedSuccessModal.vue";
-import DoneArrowRight from "../../../assets/images/DoneArrowRight.svg"
+import DoneArrowRight from "../../../assets/images/DoneArrowRight.svg";
+import api from "../../../services/api.js";
 
 
 const props = defineProps({
@@ -128,6 +135,59 @@ const description = ref("It is a long established fact that a reader will be dis
 const isStep1Valid = ref(false);
 const showSuccessModal = ref(false);
 const brandIdentityRef = ref(null);
+const isSubmitting = ref(false);
+const submitError = ref("");
+
+/** Snapshot when leaving step 2 — BrandIdentity unmounts on step 3 */
+const savedBrandColors = ref(null);
+const savedBrandVoice = ref(null);
+const savedTypography = ref("Open Sans");
+const brandLogoUrl = ref("");
+
+const DEFAULT_BRAND_COLORS = {
+  primary: "#2684FF",
+  secondary: "#8CB9FF",
+  font: "#5A6772",
+};
+
+const normalizeWebsite = (raw) => {
+  const s = (raw || "").trim();
+  if (!s) return "";
+  if (!/^https?:\/\//i.test(s)) return `https://${s}`;
+  return s;
+};
+
+const brandColorsToApiArray = (colors) => {
+  const c = colors && typeof colors === "object" ? colors : DEFAULT_BRAND_COLORS;
+  const primary = c.primary || DEFAULT_BRAND_COLORS.primary;
+  const secondary = c.secondary || DEFAULT_BRAND_COLORS.secondary;
+  return [primary, secondary];
+};
+
+const brandVoiceForApi = (voice) => {
+  if (voice === "professional") return "formal";
+  return voice || "friendly";
+};
+
+const buildProductCreateBody = () => ({
+  name: productName.value.trim() || "Untitled product",
+  website: normalizeWebsite(websiteUrl.value),
+  typography: savedTypography.value || "Open Sans",
+  brandColors: brandColorsToApiArray(savedBrandColors.value),
+  brandVoice: brandVoiceForApi(savedBrandVoice.value),
+  brandLogoUrl: brandLogoUrl.value || "",
+  additionalInstructions: (description.value || "").trim(),
+});
+
+const continueDisabled = computed(
+  () =>
+    (props.currentStep === 1 && !isStep1Valid.value) || isSubmitting.value
+);
+
+const proceedButtonLabel = computed(() => {
+  if (isSubmitting.value && props.currentStep === 3) return "Saving…";
+  return props.currentStep === 3 ? "Proceed" : "Continue";
+});
 
 // Refs for step navigation scrolling
 const scrollContainer = ref(null);
@@ -165,6 +225,7 @@ const scrollToActiveStep = () => {
 
 // Watch for step changes and scroll to active step
 watch(() => props.currentStep, () => {
+  submitError.value = "";
   scrollToActiveStep();
 }, { immediate: true });
 
@@ -178,14 +239,37 @@ const handleBack = () => {
   }
 };
 
-const handleContinue = () => {
-  // If on step 3, show success modal instead of moving to next step
+const handleContinue = async () => {
   if (props.currentStep === 3) {
-    showSuccessModal.value = true;
+    submitError.value = "";
+    isSubmitting.value = true;
+    try {
+      const body = buildProductCreateBody();
+      await api.post("/api/products", body);
+      showSuccessModal.value = true;
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Could not create product. Please try again.";
+      submitError.value = typeof msg === "string" ? msg : "Could not create product.";
+      console.error("POST /api/products failed:", err);
+    } finally {
+      isSubmitting.value = false;
+    }
     return;
   }
-  
+
   const identity = brandIdentityRef.value?.getBrandIdentitySelections?.() ?? {};
+
+  if (props.currentStep === 2) {
+    savedBrandColors.value = identity.brandColors
+      ? { ...identity.brandColors }
+      : { ...DEFAULT_BRAND_COLORS };
+    savedBrandVoice.value = identity.brandVoice ?? "friendly";
+    savedTypography.value = identity.typography ?? "Open Sans";
+  }
 
   emit("continue", {
     websiteUrl: websiteUrl.value,
@@ -193,6 +277,7 @@ const handleContinue = () => {
     description: description.value,
     brandColors: identity.brandColors,
     brandVoice: identity.brandVoice,
+    typography: identity.typography,
     moveToNextStep: true,
   });
 };

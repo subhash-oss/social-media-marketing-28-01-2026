@@ -13,10 +13,10 @@
 
         <div class="fluid-container">
             <div class="base"></div>
-            <div class="blob c1"></div>
-            <div class="blob c2"></div>
-            <div class="blob c3"></div>
-            <div class="blob c4"></div>
+            <div class="blob c1" :style="blobStyle(0)"></div>
+            <div class="blob c2" :style="blobStyle(1)"></div>
+            <div class="blob c3" :style="blobStyle(2)"></div>
+            <div class="blob c4" :style="blobStyle(3)"></div>
         </div>
     </div>
 
@@ -43,9 +43,26 @@
     </p>
   </div>
 </template>
-<script setup>  
-    import LogoImage from '../../assets/images/LogoImage.png'
-    import Logo from '../../components/common/Logo.vue';
+<script setup>
+import Logo from "../../components/common/Logo.vue";
+
+/** Optional hex colors (e.g. product `brandColors`) to tint the sphere; auth pages omit this. */
+const props = defineProps({
+  previewBrandColors: {
+    type: Array,
+    default: null,
+  },
+});
+
+function blobStyle(index) {
+  const list = props.previewBrandColors;
+  if (!Array.isArray(list) || !list.length) return {};
+  const hex = String(list[index % list.length]).trim();
+  if (!/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex)) return {};
+  return {
+    background: `radial-gradient(circle at 35% 35%, ${hex}, transparent 45%)`,
+  };
+}
 </script>
 
 <style setup>

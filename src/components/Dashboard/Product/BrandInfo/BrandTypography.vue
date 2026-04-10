@@ -12,7 +12,7 @@
           class="relative flex items-center rounded-lg w-[100%] md:w-[70%] mt-sm md:mt-0"
         >
           <select
-            v-model="fonts.body"
+            v-model="typography"
             class="w-full appearance-none rounded-lg border border-gray-400 px-3xl py-xl label_1_regular primary_text_color
             focus-visible:outline-none
          focus-visible:ring-1
@@ -49,7 +49,7 @@
           class="relative flex items-center rounded-xl w-[100%] md:w-[70%] mt-sm md:mt-0"
         >
           <select
-            v-model="fonts.body"
+            v-model="typography"
             class="w-full appearance-none rounded-lg border border-gray-400 px-3xl py-xl label_2_medium primary_text_color 
             focus-visible:outline-none
          focus-visible:ring-1
@@ -80,10 +80,8 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
-
-const fonts = reactive({
-  heading: 'Saraban',
-  body: 'Open Sans',
+const typography = defineModel("typography", {
+  type: String,
+  default: "Open Sans",
 });
 </script>

@@ -1,68 +1,200 @@
 <template>
-  <div class="bg_secondary_color rounded-2xl p-6xl primary_border_color h-[100%]">
-  <div class="mb-4 ">
-    <div class=" lg:w-1/2">
-      <!-- Left Side: Illustration -->
-      <div class=" flex-shrink-0">
-        <img
-          :src="BrandIllustration"
-          alt="Brand Setup Illustration"
-          class="h-auto w-48"
-        />
-      </div>
+  <div
+    :class="[
+      'h-[100%]',
+      variant === 'edit'
+        ? 'bg_secondary_color rounded-2xl p-6xl brand_section_height primary_border_color'
+        : 'bg_secondary_color rounded-2xl p-6xl primary_border_color h-[100%]',
+    ]"
+  >
+    <!-- Create flow: illustration + stacked fields -->
+    <template v-if="variant === 'create'">
+      <div class="mb-4">
+        <div class="lg:w-1/2">
+          <div class="flex-shrink-0">
+            <img
+              :src="BrandIllustration"
+              alt="Brand Setup Illustration"
+              class="h-auto w-48"
+            />
+          </div>
 
-      <!-- Right Side: Form Content -->
-      <div class="flex-1 mt-6xl">
-        <h2 class="heading_h6_bold primary_text_color">
-          Tell us about your brand
-        </h2>
-        <p class="label_1_regular secondary_text_color mt-md">
-          Paste your website URL or upload documents so AI can learn your brand's style, tone, and personality.
-        </p>
+          <div class="flex-1 mt-6xl">
+            <h2 class="heading_h6_bold primary_text_color">
+              Tell us about your brand
+            </h2>
+            <p class="label_1_regular secondary_text_color mt-md">
+              Paste your website URL or upload documents so AI can learn your brand's style, tone, and personality.
+            </p>
 
-        <!-- Website URL Input -->
-        <div class="mt-6xl">
-          <label class="label_2_semiboldblock primary_text_color">
-            Website URL
-          </label>
-          <input
-            :value="getWebsiteUrl()"
-            @input="handleUrlInput"
-            type="url"
-            placeholder="Enter your website URL here..."
-            :class="[
-              'input_box w-full Label_2_Medium bg_secondary_color tertiary_text_color regular_border_color mt-sm py-xl px-3xl',
-              urlError ? '!border-error-600 !border-1' : ''
-            ]"
-          />
-          <!-- Error Message -->
-          <p v-if="urlError" class="mt-md label_2_semibold text-error-600 flex items-center gap-sm">
-            <img :src="WarningIcon" alt="WarningIcon">
-            {{ urlError }}
-          </p>
+            <div class="mt-6xl">
+              <label class="label_2_semiboldblock primary_text_color"> Website URL </label>
+              <input
+                :value="getWebsiteUrl()"
+                @input="handleUrlInput"
+                type="url"
+                placeholder="Enter your website URL here..."
+                :class="[
+                  'input_box w-full Label_2_Medium bg_secondary_color tertiary_text_color regular_border_color mt-sm py-xl px-3xl',
+                  urlError ? '!border-error-600 !border-1' : '',
+                ]"
+              />
+              <p
+                v-if="urlError"
+                class="mt-md label_2_semibold text-error-600 flex items-center gap-sm"
+              >
+                <img :src="WarningIcon" alt="" />
+                {{ urlError }}
+              </p>
+            </div>
+
+            <div class="mt-6xl">
+              <span class="label_2_medium secondary_text_color">Or </span>
+              <button
+                type="button"
+                @click="showUploadModal = true"
+                class="label_2_medium primary_text_color underline"
+              >
+                click here to upload files
+              </button>
+              <span class="label_2_medium secondary_text_color">
+                to help AI learn your brand.
+              </span>
+            </div>
+          </div>
         </div>
+      </div>
+    </template>
 
-        <!-- Upload Files Link -->
-        <div class="mt-6xl">
-          <span class="label_2_medium secondary_text_color">Or </span>
-          <button
-            @click="showUploadModal = true"
-            class="label_2_medium primary_text_color underline"
+    <!-- Edit product: same row pattern as Brand Info / Product Info fields (label left, field right) -->
+    <template v-else>
+      <div class="flex flex-col gap-11xl">
+        <div class="flex flex-col justify-between md:flex-row md:items-start">
+          <label
+            class="label_2_medium primary_text_color w-32 flex-shrink-0 pt-0 md:pt-2"
           >
-            click here to upload files
-          </button>
-          <span class="label_2_medium secondary_text_color"> to help AI learn your brand.</span>
-          <input
-            ref="fileInput"
-            type="file"
-            multiple
-            accept=".pdf,.png,.jpg,.jpeg"
-            class="hidden"
-            @change="handleFileChange"
-          />
+            Website
+          </label>
+          <div class="w-[100%] md:w-[70%]">
+            <input
+              :value="getWebsiteUrl()"
+              @input="handleUrlInput"
+              type="url"
+              placeholder="https://example.com"
+              :class="[
+                'input_box w-full border border-gray-400 py-xl px-3xl mt-sm md:mt-0 label_1_regular primary_text_color rounded-lg outline-none focus-visible:ring-1 focus-visible:ring-black-50 focus-visible:border-black-200',
+                urlError ? '!border-error-600' : '',
+              ]"
+            />
+            <p
+              v-if="urlError"
+              class="mt-md label_2_semibold text-error-600 flex items-center gap-sm"
+            >
+              <img :src="WarningIcon" alt="" class="shrink-0" />
+              {{ urlError }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col justify-between md:flex-row md:items-start">
+          <label class="label_2_medium primary_text_color w-32 flex-shrink-0">
+            Uploaded Docs
+          </label>
+          <div class="w-[100%] md:w-[70%] space-y-3">
+            <!-- Brand logo from API (remote URL) -->
+            <div
+              v-if="trimmedBrandLogoUrl"
+              class="flex items-center gap-xl rounded-lg border primary_border_color bg_secondary_color p-xl"
+            >
+              <div
+                class="h-11 w-11 shrink-0 overflow-hidden rounded-md border primary_border_color bg-[#F3F4FD]"
+              >
+                <img
+                  v-if="!brandLogoImgError"
+                  :src="trimmedBrandLogoUrl"
+                  alt=""
+                  class="h-full w-full object-cover"
+                  @error="brandLogoImgError = true"
+                />
+                <div
+                  v-else
+                  class="flex h-full w-full items-center justify-center bg-gray-25"
+                >
+                  <img
+                    :src="UploadaImageIcon"
+                    alt=""
+                    class="h-6 w-6 opacity-70"
+                  />
+                </div>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="label_3_bold primary_text_color truncate">
+                  {{ brandLogoFileLabel }}
+                </p>
+                <p class="label_3_regular secondary_text_color mt-xs">
+                  {{ brandLogoMetaLabel }}
+                </p>
+              </div>
+              <span
+                class="shrink-0 text-gray-400 opacity-70"
+                aria-hidden="true"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 4l7.2 7.2-7.2 7.2-7.2-7.2L12 4z" />
+                </svg>
+              </span>
+            </div>
+
+            <!-- Local uploads completed in this session -->
+            <div
+              v-for="fileItem in completedLocalFiles"
+              :key="fileItem.id"
+              class="flex items-center gap-xl rounded-lg border primary_border_color bg_secondary_color p-xl"
+            >
+              <div
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border primary_border_color bg-gray-25"
+              >
+                <img :src="UploadaImageIcon" alt="" class="h-6 w-6 opacity-80" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="label_3_bold primary_text_color truncate">
+                  {{ fileItem.name }}
+                </p>
+                <p class="label_3_regular secondary_text_color mt-xs">
+                  {{ formatFileSize(fileItem.size) }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="inline-flex w-full items-center justify-center gap-sm rounded-lg border border-gray-300 bg_secondary_color px-4 py-3 label_2_medium secondary_text_color transition-colors hover:bg-gray-25 sm:w-auto"
+              @click="showUploadModal = true"
+            >
+              <span class="text-lg font-medium leading-none text-gray-500">+</span>
+              Add more files
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
+
+    <input
+      ref="fileInput"
+      type="file"
+      multiple
+      accept=".pdf,.png,.jpg,.jpeg"
+      class="hidden"
+      @change="handleFileChange"
+    />
 
     <!-- Upload Brand Files Modal -->
     <div
@@ -263,7 +395,6 @@
       </div>
     </div>
   </div>
- </div> 
 </template>
 
 <script setup>
@@ -286,9 +417,26 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  /** `edit` matches product edit screen (label left, field right); `create` keeps the wizard layout */
+  variant: {
+    type: String,
+    default: "create",
+    validator: (v) => v === "create" || v === "edit",
+  },
 });
 
-const emit = defineEmits(["update:websiteUrl", "update:website-url", "files-selected", "validation-change"]);
+const brandLogoUrl = defineModel("brandLogoUrl", {
+  type: String,
+  default: "",
+});
+
+const emit = defineEmits([
+  "update:websiteUrl",
+  "update:website-url",
+  "files-selected",
+  "validation-change",
+  "files-state-change",
+]);
 
 const fileInput = ref(null);
 const dropZone = ref(null);
@@ -311,6 +459,45 @@ const ACCEPTED_FORMATS = ['.pdf', '.png', '.jpg', '.jpeg'];
 const completedFilesCount = computed(() => {
   return fileList.value.filter(f => f.status === 'completed').length;
 });
+
+const brandLogoImgError = ref(false);
+
+watch(brandLogoUrl, () => {
+  brandLogoImgError.value = false;
+});
+
+const trimmedBrandLogoUrl = computed(() => (brandLogoUrl.value || "").trim());
+
+function fileNameFromUrl(url) {
+  if (!url) return "Brand logo";
+  try {
+    const normalized =
+      url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`;
+    const u = new URL(normalized);
+    const seg = u.pathname.split("/").filter(Boolean).pop();
+    if (seg) return decodeURIComponent(seg);
+    return "Brand logo";
+  } catch {
+    const parts = String(url).split(/[/\\]/);
+    const last = parts.filter(Boolean).pop();
+    return last ? decodeURIComponent(last) : "Brand logo";
+  }
+}
+
+const brandLogoFileLabel = computed(() =>
+  trimmedBrandLogoUrl.value ? fileNameFromUrl(trimmedBrandLogoUrl.value) : ""
+);
+
+const brandLogoMetaLabel = computed(() =>
+  trimmedBrandLogoUrl.value ? "Image · remote URL" : ""
+);
+
+/** Completed uploads shown under Uploaded Docs (edit layout) */
+const completedLocalFiles = computed(() =>
+  props.variant === "edit"
+    ? fileList.value.filter((f) => f.status === "completed")
+    : []
+);
 
 // Format file size
 const formatFileSize = (bytes) => {
@@ -574,6 +761,22 @@ const handleContinue = () => {
     closeModal();
   }
 };
+
+watch(
+  fileList,
+  () => emit("files-state-change"),
+  { deep: true }
+);
+
+defineExpose({
+  getUploadsSignature() {
+    return fileList.value
+      .filter((f) => f.status === "completed")
+      .map((f) => `${f.name}:${f.size}`)
+      .sort()
+      .join("|");
+  },
+});
 
 // Check if files exist on mount (preserve state when navigating back)
 onMounted(() => {

@@ -45,7 +45,7 @@
             </button> -->
             <button
               type="button"
-              @click="$emit('add-product')"
+              @click="emit('add-product')"
               class="inline-flex items-center gap-md primary_button px-xl py-md"
             >
               <img :src="PlusIconWhite" alt="" class="h-4 w-4" />
@@ -59,7 +59,12 @@
         <article
           v-for="product in filteredProducts"
           :key="product.id"
-          class="rounded-2xl border primary_border_color bg_secondary_color p-5xl shadow-sm"
+          class="rounded-2xl border primary_border_color bg_secondary_color p-5xl shadow-sm cursor-pointer transition-shadow hover:shadow-md"
+          role="button"
+          tabindex="0"
+          @click="onProductCardClick(product, $event)"
+          @keydown.enter.prevent="emitSelectProduct(product)"
+          @keydown.space.prevent="emitSelectProduct(product)"
         >
           <div class="flex items-start justify-between gap-3">
             <div class="flex min-w-0 items-center gap-3">
@@ -111,7 +116,7 @@
                 <button
                   type="button"
                   class="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left label_2_medium primary_text_color transition-colors hover:bg-gray-25"
-                  @click="closeMenu"
+                  @click.stop="emitSelectProduct(product)"
                 >
                   <span>Edit</span>
                   <img :src="ImageEditIcon" alt="" class="h-4 w-4 shrink-0 opacity-80" />
@@ -196,7 +201,7 @@
         </p>
 
         <button
-          @click="$emit('add-product')"
+          @click="emit('add-product')"
           class="mt-5xl flex items-center gap-md primary_button px-xl py-md"
         >
           <img :src="PlusIconWhite" alt="">
@@ -224,7 +229,7 @@ import TikTokIcon from "../../../assets/images/TikTokIcon.svg";
 import YoutubeIcon from "../../../assets/images/YoutubeIcon.svg";
 import PlatformIcon from "../../../assets/images/PlatformIcon.svg";
 
-defineEmits(["add-product"]);
+const emit = defineEmits(["add-product", "select-product"]);
 
 const products = ref([]);
 const isLoading = ref(true);
@@ -371,6 +376,16 @@ function closeMenu() {
   openMenuId.value = null;
 }
 
+function emitSelectProduct(product) {
+  closeMenu();
+  emit("select-product", product);
+}
+
+function onProductCardClick(product, e) {
+  if (e?.target?.closest?.("[data-product-card-menu]")) return;
+  emitSelectProduct(product);
+}
+
 /** DELETE /api/products/:id */
 async function handleDeleteProduct(product) {
   const id = product?.id;
@@ -425,5 +440,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener("click", onDocClick);
+});
+
+defineExpose({
+  fetchProducts,
 });
 </script>
